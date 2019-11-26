@@ -77,6 +77,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         File index = new File(Environment.getExternalStorageDirectory(), "Models/");
         if(!index.exists()){
             index.mkdir();
+            return;
         }
         String[] entries = index.list();
         for(String s: entries){
