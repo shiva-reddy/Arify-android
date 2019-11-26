@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 
 public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener{
 
+    //TODO: share map as an intent instead of static object
     public static Map<Bitmap, File> imageTargetVsObjLocationMap = new HashMap<>();
 
     private String chosenScene;
