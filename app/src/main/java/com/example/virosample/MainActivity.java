@@ -40,8 +40,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static com.example.virosample.ApiClient.getImageTargetVsObjectsforScene;
-
 public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener{
 
     public static Map<Bitmap, File> imageTargetVsObjLocationMap = new HashMap<>();
@@ -66,7 +64,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         StrictMode.setThreadPolicy(policy);
 
         clearModelsDirectory();
-        imageTargetVsObjLocationMap = getImageTargetVsObjectsforScene("scene_1")
+        imageTargetVsObjLocationMap = ApiClient.build()
+                .getImageTargetVsObjectsforScene("scene_1") //TODO: update this to use dynamic scene
                 .entrySet().stream()
                 .collect(Collectors.toMap(e -> getImageAssetUri(e.getKey()), e -> getArObjectAssetUri(e.getValue())));
         Intent startAR = new Intent(MainActivity.this, ViroActivityAR.class);
@@ -77,6 +76,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         File index = new File(Environment.getExternalStorageDirectory(), "Models/");
         if(!index.exists()){
             index.mkdir();
+            return;
         }
         String[] entries = index.list();
         for(String s: entries){
