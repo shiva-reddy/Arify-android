@@ -12,6 +12,9 @@ import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.amazonaws.util.IOUtils;
@@ -39,20 +42,29 @@ import java.util.stream.Collectors;
 
 import static com.example.virosample.ApiClient.getImageTargetVsObjectsforScene;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener{
 
     public static Map<Bitmap, File> imageTargetVsObjLocationMap = new HashMap<>();
+
+    private String chosenScene;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findViewById(R.id.start).setOnClickListener((v)-> start());
+        final Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(this);
     }
 
     private void start() {
+//        if(chosenScene == null){
+//            return;
+//        }
+        //TODO: all network calls need to be async, this is a temporary work around
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
         clearModelsDirectory();
         imageTargetVsObjLocationMap = getImageTargetVsObjectsforScene("scene_1")
                 .entrySet().stream()
@@ -63,6 +75,9 @@ public class MainActivity extends Activity {
 
     private void clearModelsDirectory(){
         File index = new File(Environment.getExternalStorageDirectory(), "Models/");
+        if(!index.exists()){
+            index.mkdir();
+        }
         String[] entries = index.list();
         for(String s: entries){
             File currentFile = new File(index.getPath(),s);
@@ -106,4 +121,13 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        chosenScene  = parent.getItemAtPosition(position).toString();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }
