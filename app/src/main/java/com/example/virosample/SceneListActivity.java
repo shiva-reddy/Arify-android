@@ -1,46 +1,36 @@
 package com.example.virosample;
 
-import android.app.Activity;
-import android.app.DownloadManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.amazonaws.util.IOUtils;
-import com.viro.core.AsyncObject3DListener;
-import com.viro.core.Object3D;
-import com.viro.core.Vector;
-import com.viro.core.ViroView;
-import com.viro.core.ViroViewARCore;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.BufferedReader;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener{
+public class SceneListActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     //TODO: share map as an intent instead of static object
     public static Map<ImageTarget, ArObject> imageTargetVsObjLocationMap = new HashMap<>();
@@ -50,10 +40,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        findViewById(R.id.start).setOnClickListener((v)-> start());
-        final Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(this);
+        setContentView(R.layout.activity_scene_list);
+        //findViewById(R.id.start).setOnClickListener((v)-> start());
+        //final Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        //spinner.setOnItemSelectedListener(this);
+
+
+        FloatingActionButton fab = findViewById(R.id.fab);
     }
 
     private void start() {
@@ -86,7 +79,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
                         }
                 ));
 
-        Intent startAR = new Intent(MainActivity.this, ViroActivityAR.class);
+        Intent startAR = new Intent(SceneListActivity.this, ViroActivityAR.class);
+
         startActivity(startAR);
     }
 
