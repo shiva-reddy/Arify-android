@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.Toast;
 
 import com.viro.core.ARAnchor;
 import com.viro.core.ARImageTarget;
@@ -30,6 +31,7 @@ import com.viro.core.ARScene;
 import com.viro.core.AnimationTimingFunction;
 import com.viro.core.AnimationTransaction;
 import com.viro.core.AsyncObject3DListener;
+import com.viro.core.Box;
 import com.viro.core.ClickListener;
 import com.viro.core.ClickState;
 import com.viro.core.Material;
@@ -37,6 +39,7 @@ import com.viro.core.Node;
 import com.viro.core.Object3D;
 import com.viro.core.Spotlight;
 import com.viro.core.Surface;
+import com.viro.core.Text;
 import com.viro.core.Texture;
 import com.viro.core.Vector;
 import com.viro.core.ViroView;
@@ -55,7 +58,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     private ARScene mScene;
     private Node mModelNode;
     private Map<String, Pair<ARImageTarget, Node>> mTargetedNodesMap;
-    private Map<Bitmap, File> imageTargetVsObjectLocation = new HashMap<>();
+    private Map<ImageTarget, ArObject> imageTargetVsObjectLocation = new HashMap<>();
+    private Map<String, String> keyVsName = new HashMap<>();
 
 
     // +---------------------------------------------------------------------------+
@@ -66,7 +70,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTargetedNodesMap = new HashMap<String, Pair<ARImageTarget, Node>>();
-        imageTargetVsObjectLocation = MainActivity.imageTargetVsObjLocationMap;
+        imageTargetVsObjectLocation = ArTestActivity.imageTargetVsObjLocationMap;
         mViroView = new ViroViewARCore(this, new ViroViewARCore.StartupListener() {
             @Override
             public void onSuccess() {
@@ -90,20 +94,40 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         imageTargetVsObjectLocation.entrySet().forEach(e ->{
             linkTargetWithNode(e.getKey(), e.getValue());
         });
+
+        // Create a new anchored node 2 meters in front of the user
+        ARNode helloWorldNode = mScene.createAnchoredNode(new Vector(0, 0, -2));
+
+        // AR node creation can fail in poor lighting conditions
+        if (helloWorldNode != null) {
+            Box box = new Box(1, 1, 1);
+            helloWorldNode.setGeometry(box);
+
+            // Create a child node for the text, above the box
+            Node textNode = new Node();
+            textNode.setPosition(new Vector(0,1,0));
+
+            // Create the 'Hello World' text
+            Text text = new Text(mViroView.getViroContext(), "Hello World", 1, 1);
+            textNode.setGeometry(text);
+            helloWorldNode.addChildNode(textNode);
+        }
     }
 
-    public void linkTargetWithNode(Bitmap imageTargetBtm, File arObjectFile){
+    public void linkTargetWithNode(ImageTarget imageTarget, ArObject arObject){
+
+        Bitmap imageTargetBtm = imageTarget.btm;
 
         ARImageTarget arImageTarget = new ARImageTarget(imageTargetBtm, ARImageTarget.Orientation.Up, 0.188f);
         mScene.addARImageTarget(arImageTarget);
 
         Node arObjectNode = new Node();
-        initARModel(arObjectNode, arObjectFile);
+        initARModel(arObjectNode, arObject.objectName ,arObject);
         initSceneLights(arObjectNode);
         arObjectNode.setVisible(false);
         mScene.getRootNode().addChildNode(arObjectNode);
 
-        linkTargetWithNode(arImageTarget, arObjectNode);
+        linkTargetWithNode(arImageTarget, imageTarget.name,arObjectNode, arObject.objectName);
     }
 
     /*
@@ -112,8 +136,9 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
      the target's transformations will be applied to the Node, thereby rendering the
      Node over the target.
      */
-    private void linkTargetWithNode(ARImageTarget imageToDetect, Node nodeToRender){
+    private void linkTargetWithNode(ARImageTarget imageToDetect, String imageTargetName, Node nodeToRender, String arObjectName){
         String key = imageToDetect.getId();
+        keyVsName.put(key, imageTargetName);
         Log.i(TAG, "Adding to key " + key);
         mTargetedNodesMap.put(key, new Pair(imageToDetect, nodeToRender));
     }
@@ -132,12 +157,14 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
      */
     @Override
     public void onAnchorFound(ARAnchor anchor, ARNode arNode) {
-        Log.i(TAG, "Anchor found");
         String anchorId = anchor.getAnchorId();
+        Log.i(TAG, "Anchor " + toName(anchorId) + " found");
+        Toast.makeText(this, "Anchor " + toName(anchorId) + " found", Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             Log.i(TAG, "Expected key " + anchorId + " not found");
             return;
         }
+        Log.i(TAG, "Anchor found at " + anchor.getPosition());
 
         Node imageTargetNode = mTargetedNodesMap.get(anchorId).second;
         Vector rot = new Vector(0,anchor.getRotation().y, 0);
@@ -155,13 +182,18 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     @Override
     public void onAnchorRemoved(ARAnchor anchor, ARNode arNode) {
         String anchorId = anchor.getAnchorId();
-        Log.i(TAG, "Anchor removed");
+        Log.i(TAG, "Anchor " + toName(anchorId) + " removed");
+        Toast.makeText(this, "Anchor " + toName(anchorId) + " removed", Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             return;
         }
 
         Node imageTargetNode = mTargetedNodesMap.get(anchorId).second;
         imageTargetNode.setVisible(false);
+    }
+
+    public String toName(String anchorId){
+        return keyVsName.get(anchorId);
     }
 
     @Override
@@ -176,17 +208,16 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     /*
      Init, loads the the Tesla Object3D, and attaches it to the passed in groupNode.
      */
-    private void initARModel(Node groupNode, File file) {
+    private void initARModel(Node groupNode, String modelName,ArObject arObject) {
         // Creation of ObjectJni to the right
         Object3D fbxNode = new Object3D();
-        fbxNode.setScale(new Vector(0.00f, 0.00f, 0.00f));
+        fbxNode.setScale(new Vector(0.1f, 0.1f, 0.1f));
         fbxNode.loadModel(mViroView.getViroContext(),
-//                Uri.parse("file:///storage/emulated/0/Models/ar_object22.obj"),
-                Uri.fromFile(file),
+                Uri.parse(arObject.objectWebLink),
                 Object3D.Type.OBJ, new AsyncObject3DListener() {
             @Override
             public void onObject3DLoaded(final Object3D object, final Object3D.Type type) {
-                Log.i(TAG, "Model successfully loaded");
+                Log.i(TAG, "Model " + modelName + " successfully loaded");
             }
 
             @Override
@@ -200,9 +231,11 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
         // Set click listeners.
         mModelNode.setClickListener(new ClickListener() {
+
             @Override
             public void onClick(int i, Node node, Vector vector) {
-
+                Log.i(TAG, "Making as invisible ");
+                node.setVisible(false);
             }
 
             @Override
