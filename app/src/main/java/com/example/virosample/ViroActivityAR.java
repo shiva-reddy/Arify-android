@@ -103,7 +103,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         mScene.addARImageTarget(arImageTarget);
 
         Node arObjectNode = new Node();
-        initARModel(arObjectNode, arObjectFile);
+        initARModel(arObjectNode, arObject.objectName ,arObjectFile);
         initSceneLights(arObjectNode);
         arObjectNode.setVisible(false);
         mScene.getRootNode().addChildNode(arObjectNode);
@@ -138,8 +138,9 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
      */
     @Override
     public void onAnchorFound(ARAnchor anchor, ARNode arNode) {
-        Log.i(TAG, "Anchor found");
         String anchorId = anchor.getAnchorId();
+        Log.i(TAG, "Anchor " + toName(anchorId) + " found");
+        Toast.makeText(this, "Anchor " + toName(anchorId) + " found", Toast.LENGTH_LONG);
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             Log.i(TAG, "Expected key " + anchorId + " not found");
             return;
@@ -161,13 +162,18 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     @Override
     public void onAnchorRemoved(ARAnchor anchor, ARNode arNode) {
         String anchorId = anchor.getAnchorId();
-        Log.i(TAG, "Anchor removed");
+        Log.i(TAG, "Anchor " + toName(anchorId) + " removed");
+        Toast.makeText(this, "Anchor " + toName(anchorId) + " removed", Toast.LENGTH_LONG);
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             return;
         }
 
         Node imageTargetNode = mTargetedNodesMap.get(anchorId).second;
         imageTargetNode.setVisible(false);
+    }
+
+    public String toName(String anchorId){
+        return keyVsName.get(anchorId);
     }
 
     @Override
@@ -182,7 +188,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     /*
      Init, loads the the Tesla Object3D, and attaches it to the passed in groupNode.
      */
-    private void initARModel(Node groupNode, File file) {
+    private void initARModel(Node groupNode, String modelName,File file) {
         // Creation of ObjectJni to the right
         Object3D fbxNode = new Object3D();
         fbxNode.setScale(new Vector(0.05f, 0.05f, 0.05f));
@@ -192,7 +198,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                 Object3D.Type.OBJ, new AsyncObject3DListener() {
             @Override
             public void onObject3DLoaded(final Object3D object, final Object3D.Type type) {
-                Log.i(TAG, "Model successfully loaded");
+                Log.i(TAG, "Model " + modelName + " successfully loaded");
             }
 
             @Override
