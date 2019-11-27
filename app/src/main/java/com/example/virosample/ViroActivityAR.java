@@ -66,7 +66,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTargetedNodesMap = new HashMap<String, Pair<ARImageTarget, Node>>();
-        imageTargetVsObjectLocation = MainActivity.imageTargetVsObjLocationMap;
+        imageTargetVsObjectLocation = SceneListActivity.imageTargetVsObjLocationMap;
         mViroView = new ViroViewARCore(this, new ViroViewARCore.StartupListener() {
             @Override
             public void onSuccess() {
@@ -179,7 +179,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     private void initARModel(Node groupNode, File file) {
         // Creation of ObjectJni to the right
         Object3D fbxNode = new Object3D();
-        fbxNode.setScale(new Vector(0.00f, 0.00f, 0.00f));
+        fbxNode.setScale(new Vector(0.05f, 0.05f, 0.05f));
         fbxNode.loadModel(mViroView.getViroContext(),
 //                Uri.parse("file:///storage/emulated/0/Models/ar_object22.obj"),
                 Uri.fromFile(file),
