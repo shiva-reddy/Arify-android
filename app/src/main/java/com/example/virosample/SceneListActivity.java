@@ -32,11 +32,6 @@ import java.util.stream.Collectors;
 
 public class SceneListActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
-    //TODO: share map as an intent instead of static object
-    public static Map<ImageTarget, ArObject> imageTargetVsObjLocationMap = new HashMap<>();
-
-    private String chosenScene;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,93 +44,8 @@ public class SceneListActivity extends AppCompatActivity implements AdapterView.
         FloatingActionButton fab = findViewById(R.id.fab);
     }
 
-    private void start() {
-//        if(chosenScene == null){
-//            return;
-//        }
-        //TODO: all network calls need to be async, this is a temporary work around
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        clearModelsDirectory();
-
-        imageTargetVsObjLocationMap = ApiClient
-                .build()
-                .listLinksForScene("scene_1")
-                .results
-                .stream()
-                .collect(Collectors.toMap(
-                        link -> {
-                            ImageTarget imageTarget = new ImageTarget();
-                            imageTarget.btm = getImageAssetUri(link.image_target.link);
-                            imageTarget.name = link.image_target.name;
-                            return imageTarget;
-                        },
-                        link ->{
-                            ArObject arObject = new ArObject();
-                            arObject.fileLink = getArObjectAssetUri(link.ar_object.link);
-                            arObject.objectName = link.ar_object.name;
-                            return arObject;
-                        }
-                ));
-
-        Intent startAR = new Intent(SceneListActivity.this, ViroActivityAR.class);
-
-        startActivity(startAR);
-    }
-
-    private void clearModelsDirectory(){
-        File index = new File(Environment.getExternalStorageDirectory(), "Models/");
-        if(!index.exists()){
-            index.mkdir();
-            return;
-        }
-//        String[] entries = index.list();
-//        for(String s: entries){
-//            File currentFile = new File(index.getPath(),s);
-//            currentFile.delete();
-//        }
-    }
-
-    private Bitmap getImageAssetUri(String link) {
-        try {
-            Log.i("my_viro_log", link);
-            URL aUrl = new URL(link);
-            return BitmapFactory.decodeStream((InputStream) aUrl.getContent());
-        } catch (Exception e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    private File getArObjectAssetUri(String objectLink){
-        Random random = new Random();
-        File file = new File(Environment.getExternalStorageDirectory(), "Models/ar_object" +  random.nextInt(99) + ".obj");
-        Log.i("my_viro_log", ""+Uri.fromFile(file));
-        downloadFile(objectLink, file);
-        return file;
-    }
-
-    void downloadFile(String _url, File _file) {
-        try {
-            URL u = new URL(_url);
-            DataInputStream stream = new DataInputStream(u.openStream());
-            byte[] buffer = IOUtils.toByteArray(stream);
-            FileOutputStream fos = new FileOutputStream(_file);
-            fos.write(buffer);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-    }
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        chosenScene  = parent.getItemAtPosition(position).toString();
     }
 
     @Override

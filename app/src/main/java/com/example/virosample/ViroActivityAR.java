@@ -68,7 +68,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTargetedNodesMap = new HashMap<String, Pair<ARImageTarget, Node>>();
-        imageTargetVsObjectLocation = SceneListActivity.imageTargetVsObjLocationMap;
+        imageTargetVsObjectLocation = ArTestActivity.imageTargetVsObjLocationMap;
         mViroView = new ViroViewARCore(this, new ViroViewARCore.StartupListener() {
             @Override
             public void onSuccess() {
