@@ -31,15 +31,6 @@ public class ApiClient {
         return new ApiClient();
     }
 
-    public Map<String, String> getImageTargetVsObjectsforScene(String sceneName) {
-        Map<String, String> imgVsObj = new HashMap<>();
-        ListLinkResult listLinkResult = listLinksForScene(sceneName);
-        listLinkResult.results.forEach(result ->{
-            imgVsObj.put(result.image_target.link, result.ar_object.link);
-        });
-        return imgVsObj;
-    }
-
     /**
      * Lists all scenes
      * @return
@@ -152,39 +143,38 @@ public class ApiClient {
     }
 
 
-    private static class SceneResult {
+    public static class SceneResult {
         String name;
     }
 
-    private static class ImageTarget{
-        String name;
-        String link;
-    }
-
-    private static class ArObject{
+    public static class ImageTarget{
         String name;
         String link;
     }
 
-    private static class LinkResult{
+    public static class ArObject{
+        String name;
+        String link;
+    }
+
+    public static class LinkResult{
         ImageTarget image_target;
         ArObject ar_object;
     }
 
-    private static class ListArObjectsResult{
+    public static class ListArObjectsResult{
         List<ArObject> results;
     }
 
-    private static class ListImageTargetsResult{
+    public static class ListImageTargetsResult{
         List<ImageTarget> results;
     }
 
-
-    private static class ListLinkResult{
+    public static class ListLinkResult{
         List<LinkResult> results;
     }
 
-    private static class ScenesListResult{
+    public static class ScenesListResult{
         List<SceneResult> results;
     }
 

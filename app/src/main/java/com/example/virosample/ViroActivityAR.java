@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.Toast;
 
 import com.viro.core.ARAnchor;
 import com.viro.core.ARImageTarget;
@@ -55,7 +56,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     private ARScene mScene;
     private Node mModelNode;
     private Map<String, Pair<ARImageTarget, Node>> mTargetedNodesMap;
-    private Map<Bitmap, File> imageTargetVsObjectLocation = new HashMap<>();
+    private Map<ImageTarget, ArObject> imageTargetVsObjectLocation = new HashMap<>();
+    private Map<String, String> keyVsName = new HashMap<>();
 
 
     // +---------------------------------------------------------------------------+
@@ -92,7 +94,10 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         });
     }
 
-    public void linkTargetWithNode(Bitmap imageTargetBtm, File arObjectFile){
+    public void linkTargetWithNode(ImageTarget imageTarget, ArObject arObject){
+
+        Bitmap imageTargetBtm = imageTarget.btm;
+        File arObjectFile = arObject.fileLink;
 
         ARImageTarget arImageTarget = new ARImageTarget(imageTargetBtm, ARImageTarget.Orientation.Up, 0.188f);
         mScene.addARImageTarget(arImageTarget);
@@ -103,7 +108,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         arObjectNode.setVisible(false);
         mScene.getRootNode().addChildNode(arObjectNode);
 
-        linkTargetWithNode(arImageTarget, arObjectNode);
+        linkTargetWithNode(arImageTarget, imageTarget.name,arObjectNode, arObject.objectName);
     }
 
     /*
@@ -112,8 +117,9 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
      the target's transformations will be applied to the Node, thereby rendering the
      Node over the target.
      */
-    private void linkTargetWithNode(ARImageTarget imageToDetect, Node nodeToRender){
+    private void linkTargetWithNode(ARImageTarget imageToDetect, String imageTargetName, Node nodeToRender, String arObjectName){
         String key = imageToDetect.getId();
+        keyVsName.put(key, imageTargetName);
         Log.i(TAG, "Adding to key " + key);
         mTargetedNodesMap.put(key, new Pair(imageToDetect, nodeToRender));
     }

@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener{
 
     //TODO: share map as an intent instead of static object
-    public static Map<Bitmap, File> imageTargetVsObjLocationMap = new HashMap<>();
+    public static Map<ImageTarget, ArObject> imageTargetVsObjLocationMap = new HashMap<>();
 
     private String chosenScene;
 
@@ -65,10 +65,27 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
         StrictMode.setThreadPolicy(policy);
 
         clearModelsDirectory();
-        imageTargetVsObjLocationMap = ApiClient.build()
-                .getImageTargetVsObjectsforScene("scene_1") //TODO: update this to use dynamic scene
-                .entrySet().stream()
-                .collect(Collectors.toMap(e -> getImageAssetUri(e.getKey()), e -> getArObjectAssetUri(e.getValue())));
+
+        imageTargetVsObjLocationMap = ApiClient
+                .build()
+                .listLinksForScene("scene_1")
+                .results
+                .stream()
+                .collect(Collectors.toMap(
+                        link -> {
+                            ImageTarget imageTarget = new ImageTarget();
+                            imageTarget.btm = getImageAssetUri(link.image_target.link);
+                            imageTarget.name = link.image_target.name;
+                            return imageTarget;
+                        },
+                        link ->{
+                            ArObject arObject = new ArObject();
+                            arObject.fileLink = getArObjectAssetUri(link.ar_object.link);
+                            arObject.objectName = link.ar_object.name;
+                            return arObject;
+                        }
+                ));
+
         Intent startAR = new Intent(MainActivity.this, ViroActivityAR.class);
         startActivity(startAR);
     }
@@ -79,11 +96,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemSelected
             index.mkdir();
             return;
         }
-        String[] entries = index.list();
-        for(String s: entries){
-            File currentFile = new File(index.getPath(),s);
-            currentFile.delete();
-        }
+//        String[] entries = index.list();
+//        for(String s: entries){
+//            File currentFile = new File(index.getPath(),s);
+//            currentFile.delete();
+//        }
     }
 
     private Bitmap getImageAssetUri(String link) {
