@@ -41,15 +41,13 @@ public class ArTestActivity extends AppCompatActivity {
 //        if(chosenScene == null){
 //            return;
 //        }
-        //TODO: all network calls need to be async, this is a temporary work around
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        clearModelsDirectory();
-
         imageTargetVsObjLocationMap = ApiClient
                 .build()
-                .listLinksForScene("scene_1")
+                .listLinksForScene("scene_2")
                 .results
                 .stream()
                 .collect(Collectors.toMap(
@@ -61,7 +59,7 @@ public class ArTestActivity extends AppCompatActivity {
                         },
                         link ->{
                             ArObject arObject = new ArObject();
-                            arObject.fileLink = getArObjectAssetUri(link.ar_object.link);
+                            arObject.objectWebLink = link.ar_object.link;
                             arObject.objectName = link.ar_object.name;
                             return arObject;
                         }
@@ -72,18 +70,6 @@ public class ArTestActivity extends AppCompatActivity {
         startActivity(startAR);
     }
 
-    private void clearModelsDirectory(){
-        File index = new File(Environment.getExternalStorageDirectory(), "Models/");
-        if(!index.exists()){
-            index.mkdir();
-            return;
-        }
-//        String[] entries = index.list();
-//        for(String s: entries){
-//            File currentFile = new File(index.getPath(),s);
-//            currentFile.delete();
-//        }
-    }
 
     private Bitmap getImageAssetUri(String link) {
         try {
@@ -95,29 +81,4 @@ public class ArTestActivity extends AppCompatActivity {
         }
     }
 
-    private File getArObjectAssetUri(String objectLink){
-        Random random = new Random();
-        File file = new File(Environment.getExternalStorageDirectory(), "Models/ar_object" +  random.nextInt(99) + ".obj");
-        Log.i("my_viro_log", ""+ Uri.fromFile(file));
-        downloadFile(objectLink, file);
-        return file;
-    }
-
-    void downloadFile(String _url, File _file) {
-        try {
-            URL u = new URL(_url);
-            DataInputStream stream = new DataInputStream(u.openStream());
-            byte[] buffer = IOUtils.toByteArray(stream);
-            FileOutputStream fos = new FileOutputStream(_file);
-            fos.write(buffer);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-    }
 }
