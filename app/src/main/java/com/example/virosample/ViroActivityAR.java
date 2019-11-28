@@ -60,6 +60,35 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     private Map<String, String> keyVsName = new HashMap<>();
 
 
+//    private Material preloadCarColorTextures(Node node){
+//        final Texture metallicTexture = new Texture(getBitmapFromAssets("object_car_main_Metallic.png"),
+//                Texture.Format.RGBA8, true, true);
+//        final Texture roughnessTexture = new Texture(getBitmapFromAssets("object_car_main_Roughness.png"),
+//                Texture.Format.RGBA8, true, true);
+//
+//        Material material = new Material();
+//        material.setMetalnessMap(metallicTexture);
+//        material.setRoughnessMap(roughnessTexture);
+//        material.setLightingModel(Material.LightingModel.PHYSICALLY_BASED);
+//        node.getGeometry().setMaterials(Arrays.asList(material));
+//
+//        // Loop through color.
+//        for (CAR_MODEL model : CAR_MODEL.values()) {
+//            Bitmap carBitmap = getBitmapFromAssets(model.getCarSrc());
+//            final Texture carTexture = new Texture(carBitmap, Texture.Format.RGBA8, true, true);
+//            mCarColorTextures.put(model, carTexture);
+//
+//            // Preload our textures into the model
+//            material.setDiffuseTexture(carTexture);
+//        }
+//
+//        material.setDiffuseTexture(mCarColorTextures.get(CAR_MODEL.WHITE));
+//        return material;
+//    }
+
+
+
+
     // +---------------------------------------------------------------------------+
     //  Initialization
     // +---------------------------------------------------------------------------+
@@ -103,7 +132,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         mScene.addARImageTarget(arImageTarget);
 
         Node arObjectNode = new Node();
-        initARModel(arObjectNode, arObjectFile);
+        initARModel(arObjectNode, arObject);
         initSceneLights(arObjectNode);
         arObjectNode.setVisible(false);
         mScene.getRootNode().addChildNode(arObjectNode);
@@ -182,17 +211,25 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     /*
      Init, loads the the Tesla Object3D, and attaches it to the passed in groupNode.
      */
-    private void initARModel(Node groupNode, File file) {
+
+    private void initARModel(Node groupNode,ArObject arObject) {
         // Creation of ObjectJni to the right
         Object3D fbxNode = new Object3D();
-        fbxNode.setScale(new Vector(0.00f, 0.00f, 0.00f));
+        Toast.makeText(this, "Loading with scale ["
+                + arObject.scaleX + ", "
+                + arObject.scaleY + ", "
+                + arObject.scaleZ + "]", Toast.LENGTH_LONG).show();
+
+        fbxNode.setScale(new Vector(arObject.scaleX, arObject.scaleY, arObject.scaleZ));
         fbxNode.loadModel(mViroView.getViroContext(),
-//                Uri.parse("file:///storage/emulated/0/Models/ar_object22.obj"),
-                Uri.fromFile(file),
-                Object3D.Type.OBJ, new AsyncObject3DListener() {
+                Uri.parse(arObject.objectWebLink),
+                arObject.type, new AsyncObject3DListener() {
             @Override
             public void onObject3DLoaded(final Object3D object, final Object3D.Type type) {
-                Log.i(TAG, "Model successfully loaded");
+                Log.i(TAG, "Model " + arObject.objectName + " successfully loaded");
+                if(arObject.mtlWebLink != null){
+                    loadTextures(object, arObject.mtlWebLink);
+                }
             }
 
             @Override
@@ -208,7 +245,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         mModelNode.setClickListener(new ClickListener() {
             @Override
             public void onClick(int i, Node node, Vector vector) {
-
+                Log.i(TAG, "Making invisible");
+                node.setVisible(false);
             }
 
             @Override
@@ -216,6 +254,15 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                 // No-op.
             }
         });
+    }
+
+    private void loadTextures(Node node, String mtlWebLink) {
+        Bitmap btm = ArTestActivity.getImageAssetUri(mtlWebLink);
+        Texture texture = new Texture(btm, Texture.Format.RGBA8, true, true);
+        Material material = new Material();
+        material.setDiffuseTexture(texture);
+        material.setLightingModel(Material.LightingModel.PHYSICALLY_BASED);
+        node.getGeometry().setMaterials(Arrays.asList(material));
     }
 
     private void initSceneLights(Node groupNode){

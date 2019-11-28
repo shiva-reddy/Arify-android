@@ -3,6 +3,7 @@ package com.example.virosample;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.viro.core.Object3D;
 
 import org.json.JSONException;
 
@@ -155,6 +156,16 @@ public class ApiClient {
     public static class ArObject{
         String name;
         String link;
+        Float scale_x, scale_y, scale_z, rot_x, rot_y, rot_z;
+        String model_type;
+        String mtl_link;
+
+        public Object3D.Type objType(){
+            if(model_type == null){
+                return null;
+            }
+            return  Object3D.Type.fromString(model_type);
+        }
     }
 
     public static class LinkResult{
