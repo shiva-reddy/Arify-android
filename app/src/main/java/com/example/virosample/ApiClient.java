@@ -169,7 +169,12 @@ public class ApiClient {
             if(model_type == null){
                 return null;
             }
-            return  Object3D.Type.fromString(model_type);
+            if(model_type.toLowerCase().equals("glb")){
+                return Object3D.Type.GLB;
+            } else if(model_type.toLowerCase().equals("fbx")){
+                return Object3D.Type.FBX;
+            }
+            throw new RuntimeException("invalid object type");
         }
     }
 
