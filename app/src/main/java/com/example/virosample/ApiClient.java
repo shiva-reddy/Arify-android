@@ -30,7 +30,7 @@ public class ApiClient {
             .build();
     Gson gson = new Gson();
 
-    private static final String BASE_URL ="https://arifyheroku.herokuapp.com";
+    private static final String BASE_URL ="https://arify-backend-1.herokuapp.com";
 
     public static ApiClient build(){
         return new ApiClient();
