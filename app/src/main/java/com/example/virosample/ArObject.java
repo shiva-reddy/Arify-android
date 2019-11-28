@@ -5,7 +5,14 @@ import com.viro.core.Object3D;
 import java.io.File;
 
 public class ArObject {
-    String objectWebLink, mtlWebLink;
+    public String objectWebLink;
+    public String mtlWebLink;
+    public Object3D.Type type;
+    public Float scaleX;
+    public Float scaleY;
+    public Float scaleZ;
+    public Float rotX;
+    public Float rotY;
+    public Float rotZ;
     String objectName;
-    Object3D.Type type = Object3D.Type.GLB;
 }

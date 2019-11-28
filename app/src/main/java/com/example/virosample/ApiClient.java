@@ -3,6 +3,7 @@ package com.example.virosample;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.viro.core.Object3D;
 
 import org.json.JSONException;
 
@@ -106,6 +107,7 @@ public class ApiClient {
         return listLinkResult;
     }
 
+
     /**
      * All Ar Objects in a scene
      * @param sceneName
@@ -158,6 +160,21 @@ public class ApiClient {
     public static class ArObject{
         String name;
         String link;
+        Float scale_x, scale_y, scale_z, rot_x, rot_y, rot_z;
+        String model_type;
+        String mtl_link;
+
+        public Object3D.Type objType(){
+            if(model_type == null){
+                return null;
+            }
+            if(model_type.toLowerCase().equals("glb")){
+                return Object3D.Type.GLB;
+            } else if(model_type.toLowerCase().equals("fbx")){
+                return Object3D.Type.FBX;
+            }
+            throw new RuntimeException("invalid object type");
+        }
     }
 
     public class SceneList {
