@@ -12,11 +12,13 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class AddTarget extends Activity {
@@ -49,26 +51,37 @@ public class AddTarget extends Activity {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
             model_spinner.setAdapter(adapter);
-            Bitmap photo = intent.getParcelableExtra("image");
-            this.setImageView(photo);
-            File file = saveImageToInternalStorage(photo);
-            apiClient.uploadImageTargetToScene(current_scene, imageTargetName, file);
         }
         catch (Exception e) {
             Log.e("onCreate()", ""+e.getMessage());
         }
+
+
+            Bitmap photo = intent.getParcelableExtra("image");
+            this.setImageView(photo);
+            File file = saveImageToInternalStorage(photo);
+            findViewById(R.id.place_model).setOnClickListener((v) -> {
+                Log.d("getText",editText.getText().toString());
+                String image_name = editText.getText().toString();
+                apiClient.uploadImageTargetToScene(current_scene, image_name, file);
+                apiClient.linkImageTargetToARObjectInScene(current_scene,model_spinner.getSelectedItem().toString(),image_name);
+            });
+
     }
     public File saveImageToInternalStorage(Bitmap image) {
-        String filename= "desiredFilename.png";
+        String filename = new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime()) + ".png";
         try {
 // Use the compress method on the Bitmap object to write image to
 // the OutputStream
-            FileOutputStream fos = getBaseContext().openFileOutput(filename, Context.MODE_PRIVATE);
-
+            FileOutputStream fos = getApplicationContext().openFileOutput(filename, Context.MODE_PRIVATE);
+            //Log.d("path",getApplicationContext().getPackageCodePath());
+            //Log.d("path",getApplicationContext().getPackageName());
+            //Log.d("path",getApplicationContext().getPackageResourcePath());
+            Log.d("path", String.valueOf(getApplicationContext().getFilesDir()));
 // Writing the bitmap to the output stream
             image.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.close();
-            File file = new File( getBaseContext().getFilesDir(), filename);
+            File file = new File(getApplicationContext().getFilesDir(), filename);
             Log.d("saveImageToInternalStorage()", filename);
             return file;
         } catch (Exception e) {
