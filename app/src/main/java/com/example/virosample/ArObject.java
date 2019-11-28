@@ -14,6 +14,5 @@ public class ArObject {
     public Float rotX;
     public Float rotY;
     public Float rotZ;
-    File fileLink;
     String objectName;
 }

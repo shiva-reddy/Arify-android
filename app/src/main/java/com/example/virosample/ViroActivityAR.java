@@ -31,6 +31,7 @@ import com.viro.core.ARScene;
 import com.viro.core.AnimationTimingFunction;
 import com.viro.core.AnimationTransaction;
 import com.viro.core.AsyncObject3DListener;
+import com.viro.core.Box;
 import com.viro.core.ClickListener;
 import com.viro.core.ClickState;
 import com.viro.core.Material;
@@ -38,6 +39,7 @@ import com.viro.core.Node;
 import com.viro.core.Object3D;
 import com.viro.core.Spotlight;
 import com.viro.core.Surface;
+import com.viro.core.Text;
 import com.viro.core.Texture;
 import com.viro.core.Vector;
 import com.viro.core.ViroView;
@@ -97,7 +99,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTargetedNodesMap = new HashMap<String, Pair<ARImageTarget, Node>>();
-        imageTargetVsObjectLocation = MainActivity.imageTargetVsObjLocationMap;
+        imageTargetVsObjectLocation = ArTestActivity.imageTargetVsObjLocationMap;
         mViroView = new ViroViewARCore(this, new ViroViewARCore.StartupListener() {
             @Override
             public void onSuccess() {
@@ -121,12 +123,29 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         imageTargetVsObjectLocation.entrySet().forEach(e ->{
             linkTargetWithNode(e.getKey(), e.getValue());
         });
+
+        // Create a new anchored node 2 meters in front of the user
+        ARNode helloWorldNode = mScene.createAnchoredNode(new Vector(0, 0, -2));
+
+        // AR node creation can fail in poor lighting conditions
+        if (helloWorldNode != null) {
+            Box box = new Box(1, 1, 1);
+            helloWorldNode.setGeometry(box);
+
+            // Create a child node for the text, above the box
+            Node textNode = new Node();
+            textNode.setPosition(new Vector(0,1,0));
+
+            // Create the 'Hello World' text
+            Text text = new Text(mViroView.getViroContext(), "Hello World", 1, 1);
+            textNode.setGeometry(text);
+            helloWorldNode.addChildNode(textNode);
+        }
     }
 
     public void linkTargetWithNode(ImageTarget imageTarget, ArObject arObject){
 
         Bitmap imageTargetBtm = imageTarget.btm;
-        File arObjectFile = arObject.fileLink;
 
         ARImageTarget arImageTarget = new ARImageTarget(imageTargetBtm, ARImageTarget.Orientation.Up, 0.188f);
         mScene.addARImageTarget(arImageTarget);
@@ -167,12 +186,14 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
      */
     @Override
     public void onAnchorFound(ARAnchor anchor, ARNode arNode) {
-        Log.i(TAG, "Anchor found");
         String anchorId = anchor.getAnchorId();
+        Log.i(TAG, "Anchor " + toName(anchorId) + " found");
+        Toast.makeText(this, "Anchor " + toName(anchorId) + " found", Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             Log.i(TAG, "Expected key " + anchorId + " not found");
             return;
         }
+        Log.i(TAG, "Anchor found at " + anchor.getPosition());
 
         Node imageTargetNode = mTargetedNodesMap.get(anchorId).second;
         Vector rot = new Vector(0,anchor.getRotation().y, 0);
@@ -190,13 +211,18 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     @Override
     public void onAnchorRemoved(ARAnchor anchor, ARNode arNode) {
         String anchorId = anchor.getAnchorId();
-        Log.i(TAG, "Anchor removed");
+        Log.i(TAG, "Anchor " + toName(anchorId) + " removed");
+        Toast.makeText(this, "Anchor " + toName(anchorId) + " removed", Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             return;
         }
 
         Node imageTargetNode = mTargetedNodesMap.get(anchorId).second;
         imageTargetNode.setVisible(false);
+    }
+
+    public String toName(String anchorId){
+        return keyVsName.get(anchorId);
     }
 
     @Override
@@ -243,6 +269,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
         // Set click listeners.
         mModelNode.setClickListener(new ClickListener() {
+
             @Override
             public void onClick(int i, Node node, Vector vector) {
                 Log.i(TAG, "Making invisible");
