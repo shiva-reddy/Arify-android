@@ -14,10 +14,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CameraTestActivity"></activity>
+        <activity
+            android:name=".ImageTargetListActivity"
+            android:label="@string/title_activity_image_target_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".CameraTestActivity" />
         <activity android:name=".ArTestActivity" />
         <activity android:name=".SceneListActivity" />
-        <activity android:name=".MainActivity" >
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

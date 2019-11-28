@@ -47,7 +47,7 @@ public class ArTestActivity extends AppCompatActivity {
 
         imageTargetVsObjLocationMap = ApiClient
                 .build()
-                .listLinksForScene("scene_2")
+                .listLinksForScene("scene_1")
                 .results
                 .stream()
                 .collect(Collectors.toMap(
