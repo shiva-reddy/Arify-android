@@ -22,6 +22,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.viro.core.ARAnchor;
@@ -113,6 +115,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             }
         });
         setContentView(mViroView);
+        View.inflate(this, R.layout.ar_controls, ((ViewGroup) mViroView));
     }
 
 
@@ -276,6 +279,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         keyVsScaleVectorMap.put(key, scale);
         objectNode.setName(arObject.objectName);
     }
+
+
 
     private void loadTextures(Node node, String mtlWebLink) {
         try {
