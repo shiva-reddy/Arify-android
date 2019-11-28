@@ -66,7 +66,7 @@ public class ApiClient {
                 .build();
 
         Request request = new Request.Builder()
-                .url(BASE_URL + "/" + scene + "/upload_image")
+                .url(/*"https://ent2dglo48e9.x.pipedream.net")*/ BASE_URL + "/scenes/" + scene + "/upload_image/")
                 .post(requestBody)
                 .build();
 
