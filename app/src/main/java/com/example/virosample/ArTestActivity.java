@@ -47,7 +47,7 @@ public class ArTestActivity extends AppCompatActivity {
 
         imageTargetVsObjLocationMap = ApiClient
                 .build()
-                .listLinksForScene("scene_2")
+                .listLinksForScene("scene_1")
                 .results
                 .stream()
                 .collect(Collectors.toMap(
@@ -61,17 +61,28 @@ public class ArTestActivity extends AppCompatActivity {
                             ArObject arObject = new ArObject();
                             arObject.objectWebLink = link.ar_object.link;
                             arObject.objectName = link.ar_object.name;
+                            arObject.mtlWebLink = link.ar_object.mtl_link;
+                            arObject.type = link.ar_object.objType();
+                            arObject.scaleX = getOrDefault(link.ar_object.scale_x, 0.1f);
+                            arObject.scaleY = getOrDefault(link.ar_object.scale_y, 0.1f);
+                            arObject.scaleZ = getOrDefault(link.ar_object.scale_z, 0.1f);
+                            arObject.rotX = getOrDefault(link.ar_object.rot_x, 0.0f);
+                            arObject.rotY = getOrDefault(link.ar_object.rot_y, 0.0f);
+                            arObject.rotZ = getOrDefault(link.ar_object.rot_z,0.0f);
                             return arObject;
                         }
                 ));
 
         Intent startAR = new Intent(this, ViroActivityAR.class);
-
         startActivity(startAR);
     }
 
+    private static Float getOrDefault(Float val, Float def){
+        return val == null? def : val;
+    }
 
-    private Bitmap getImageAssetUri(String link) {
+
+    public static Bitmap getImageAssetUri(String link) {
         try {
             Log.i("my_viro_log", link);
             URL aUrl = new URL(link);

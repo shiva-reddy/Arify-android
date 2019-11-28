@@ -56,10 +56,40 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     private static final String TAG = "my_viro_log";
     private ViroView mViroView;
     private ARScene mScene;
-    private Node mModelNode;
     private Map<String, Pair<ARImageTarget, Node>> mTargetedNodesMap;
     private Map<ImageTarget, ArObject> imageTargetVsObjectLocation = new HashMap<>();
     private Map<String, String> keyVsName = new HashMap<>();
+    private Map<String, Node> keyVObjectNodeMap = new HashMap<>();
+    private Map<String, Vector> keyVsScaleVectorMap = new HashMap<>();
+
+
+//    private Material preloadCarColorTextures(Node node){
+//        final Texture metallicTexture = new Texture(getBitmapFromAssets("object_car_main_Metallic.png"),
+//                Texture.Format.RGBA8, true, true);
+//        final Texture roughnessTexture = new Texture(getBitmapFromAssets("object_car_main_Roughness.png"),
+//                Texture.Format.RGBA8, true, true);
+//
+//        Material material = new Material();
+//        material.setMetalnessMap(metallicTexture);
+//        material.setRoughnessMap(roughnessTexture);
+//        material.setLightingModel(Material.LightingModel.PHYSICALLY_BASED);
+//        node.getGeometry().setMaterials(Arrays.asList(material));
+//
+//        // Loop through color.
+//        for (CAR_MODEL model : CAR_MODEL.values()) {
+//            Bitmap carBitmap = getBitmapFromAssets(model.getCarSrc());
+//            final Texture carTexture = new Texture(carBitmap, Texture.Format.RGBA8, true, true);
+//            mCarColorTextures.put(model, carTexture);
+//
+//            // Preload our textures into the model
+//            material.setDiffuseTexture(carTexture);
+//        }
+//
+//        material.setDiffuseTexture(mCarColorTextures.get(CAR_MODEL.WHITE));
+//        return material;
+//    }
+
+
 
 
     // +---------------------------------------------------------------------------+
@@ -94,24 +124,6 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         imageTargetVsObjectLocation.entrySet().forEach(e ->{
             linkTargetWithNode(e.getKey(), e.getValue());
         });
-
-        // Create a new anchored node 2 meters in front of the user
-        ARNode helloWorldNode = mScene.createAnchoredNode(new Vector(0, 0, -2));
-
-        // AR node creation can fail in poor lighting conditions
-        if (helloWorldNode != null) {
-            Box box = new Box(1, 1, 1);
-            helloWorldNode.setGeometry(box);
-
-            // Create a child node for the text, above the box
-            Node textNode = new Node();
-            textNode.setPosition(new Vector(0,1,0));
-
-            // Create the 'Hello World' text
-            Text text = new Text(mViroView.getViroContext(), "Hello World", 1, 1);
-            textNode.setGeometry(text);
-            helloWorldNode.addChildNode(textNode);
-        }
     }
 
     public void linkTargetWithNode(ImageTarget imageTarget, ArObject arObject){
@@ -122,7 +134,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         mScene.addARImageTarget(arImageTarget);
 
         Node arObjectNode = new Node();
-        initARModel(arObjectNode, arObject.objectName ,arObject);
+        initARModel(arObjectNode, arObject, arImageTarget.getId());
         initSceneLights(arObjectNode);
         arObjectNode.setVisible(false);
         mScene.getRootNode().addChildNode(arObjectNode);
@@ -158,8 +170,13 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     @Override
     public void onAnchorFound(ARAnchor anchor, ARNode arNode) {
         String anchorId = anchor.getAnchorId();
-        Log.i(TAG, "Anchor " + toName(anchorId) + " found");
-        Toast.makeText(this, "Anchor " + toName(anchorId) + " found", Toast.LENGTH_LONG).show();
+
+        if(toName(anchorId) == null){
+            return;
+        }
+        Node objectNode = keyVObjectNodeMap.get(anchorId);
+        Log.i(TAG, "Anchor " + toName(anchorId) + " found, Loading model " + objectNode.getName());
+        Toast.makeText(this, "Anchor " + toName(anchorId) + " found. Loading " + objectNode.getName(), Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             Log.i(TAG, "Expected key " + anchorId + " not found");
             return;
@@ -171,7 +188,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         imageTargetNode.setPosition(anchor.getPosition());
         imageTargetNode.setRotation(rot);
         imageTargetNode.setVisible(true);
-        animateModelVisible(mModelNode);
+        animateModelVisible(imageTargetNode, keyVsScaleVectorMap.get(anchorId));
 
         // Stop the node from moving in place once found
 //        ARImageTarget imgTarget = mTargetedNodesMap.get(anchorId).first;
@@ -183,7 +200,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     public void onAnchorRemoved(ARAnchor anchor, ARNode arNode) {
         String anchorId = anchor.getAnchorId();
         Log.i(TAG, "Anchor " + toName(anchorId) + " removed");
-        Toast.makeText(this, "Anchor " + toName(anchorId) + " removed", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "Anchor " + toName(anchorId) + " removed", Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             return;
         }
@@ -208,16 +225,29 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     /*
      Init, loads the the Tesla Object3D, and attaches it to the passed in groupNode.
      */
-    private void initARModel(Node groupNode, String modelName,ArObject arObject) {
+
+    private void initARModel(Node groupNode,ArObject arObject, String key) {
         // Creation of ObjectJni to the right
-        Object3D fbxNode = new Object3D();
-        fbxNode.setScale(new Vector(0.1f, 0.1f, 0.1f));
-        fbxNode.loadModel(mViroView.getViroContext(),
-                Uri.parse(arObject.objectWebLink),
-                Object3D.Type.OBJ, new AsyncObject3DListener() {
+        Object3D objectNode = new Object3D();
+//        Log.i(TAG, "Loading with scale ["
+//                + arObject.scaleX + ", "
+//                + arObject.scaleY + ", "
+//                + arObject.scaleZ + "]");
+//        Toast.makeText(this, "Loading with scale ["
+//                + arObject.scaleX + ", "
+//                + arObject.scaleY + ", "
+//                + arObject.scaleZ + "]", Toast.LENGTH_LONG).show();
+
+        Vector scale = new Vector(arObject.scaleX, arObject.scaleY, arObject.scaleZ);
+        objectNode.loadModel(mViroView.getViroContext(), Uri.parse(arObject.objectWebLink), arObject.type, new AsyncObject3DListener() {
             @Override
             public void onObject3DLoaded(final Object3D object, final Object3D.Type type) {
-                Log.i(TAG, "Model " + modelName + " successfully loaded");
+                Log.i(TAG, "Model " + arObject.objectName + " successfully loaded");
+                if(arObject.mtlWebLink != null){
+                    loadTextures(object, arObject.mtlWebLink);
+                } else{
+                    Toast.makeText(ViroActivityAR.this, "No materials to load !!", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
@@ -226,15 +256,14 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             }
         });
 
-        groupNode.addChildNode(fbxNode);
-        mModelNode = fbxNode;
+        groupNode.addChildNode(objectNode);
 
         // Set click listeners.
-        mModelNode.setClickListener(new ClickListener() {
+        objectNode.setClickListener(new ClickListener() {
 
             @Override
             public void onClick(int i, Node node, Vector vector) {
-                Log.i(TAG, "Making as invisible ");
+                Log.i(TAG, "Making invisible");
                 node.setVisible(false);
             }
 
@@ -243,6 +272,22 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                 // No-op.
             }
         });
+        keyVObjectNodeMap.put(key, objectNode);
+        keyVsScaleVectorMap.put(key, scale);
+        objectNode.setName(arObject.objectName);
+    }
+
+    private void loadTextures(Node node, String mtlWebLink) {
+        try {
+            Bitmap btm = ArTestActivity.getImageAssetUri(mtlWebLink);
+            Texture texture = new Texture(btm, Texture.Format.RGBA8, true, true);
+            Material material = new Material();
+            material.setDiffuseTexture(texture);
+            material.setLightingModel(Material.LightingModel.PHYSICALLY_BASED);
+            node.getGeometry().setMaterials(Arrays.asList(material));
+        } catch (Exception e){
+            Log.i(TAG, e.getMessage());
+        }
     }
 
     private void initSceneLights(Node groupNode){
@@ -300,8 +345,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         AnimationTransaction.commit();
     }
 
-    private void animateModelVisible(Node model) {
-        animateScale(model, 500, new Vector(0.09f, 0.09f, 0.09f), AnimationTimingFunction.EaseInEaseOut, null);
+    private void animateModelVisible(Node model, Vector targetScale) {
+        animateScale(model, 500, targetScale, AnimationTimingFunction.EaseInEaseOut, null);
     }
 
 
