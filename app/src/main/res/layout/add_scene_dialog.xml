@@ -67,22 +67,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-
-
-            <EditText
-                android:id="@+id/sceneName_editText"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/sceneWrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="16dp"
-                android:text="Scene name"
-                android:textSize="40sp"
+                android:layout_marginLeft="30sp"
+                android:layout_marginTop="15sp"
+                android:hint="Scene Name"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusBottomEnd="5dp"
+                app:boxCornerRadiusBottomStart="5dp"
+                app:boxCornerRadiusTopEnd="5dp"
+                app:boxCornerRadiusTopStart="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
 
-
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/sceneName_editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    android:textSize="35sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
