@@ -11,7 +11,9 @@ import androidx.appcompat.widget.Toolbar;
 import android.os.StrictMode;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -38,7 +40,7 @@ public class ImageTargetListActivity extends AppCompatActivity {
 
         SCENE_NAME = getIntent().getStringExtra("SCENE_NAME");
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+       /* StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         imageTargetVsObjLocationMap = ApiClient
@@ -57,7 +59,13 @@ public class ImageTargetListActivity extends AppCompatActivity {
                             viroArObject.objectName = link.ar_object.name;
                             return viroArObject;
                         }
-                ));
+                ));*/
+       /*ArrayList<ArObject> arObjects = new ArrayList<>();
+       arObjects.add(new ArObject("Object1"));
+        arObjects.add(new ArObject("Object2"));
+
+        imageTargetVsObjLocationMap.put(,arObjects);*/
+
     }
 
 }
