@@ -3,11 +3,12 @@
     android:id="@+id/imageTargetlist_RelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginTop="?android:attr/actionBarSize">
 
-    <ListView
+    <ExpandableListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@null"
+        android:indicatorRight="?android:attr/expandableListPreferredChildIndicatorRight"
         android:id="@+id/image_target_list_view"/>
 </RelativeLayout>

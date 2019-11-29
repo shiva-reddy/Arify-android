@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -21,7 +22,7 @@
             android:layout_height="match_parent">
 
             <ImageButton
-                android:id="@+id/fullscreen_dialog_close"
+                android:id="@+id/edit_objects_fullscreen_dialog_close"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -35,13 +36,13 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
-                android:layout_toEndOf="@id/fullscreen_dialog_close"
-                android:text="Add Scene"
+                android:layout_toEndOf="@id/edit_objects_fullscreen_dialog_close"
+                android:text="Add AR Objects"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/fullscreen_dialog_action"
+                android:id="@+id/edit_objects_fullscreen_dialog_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -67,31 +68,36 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/sceneWrapper"
+            <LinearLayout
+                android:id="@+id/objectName_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30sp"
-                android:layout_marginTop="15sp"
-                android:hint="Scene Name"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="5dp"
-                app:boxCornerRadiusBottomStart="5dp"
-                app:boxCornerRadiusTopEnd="5dp"
-                app:boxCornerRadiusTopStart="5dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="3"
+                android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/sceneName_editText"
-                    android:layout_width="match_parent"
+                <TextView
+
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:textSize="35sp" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginTop="32dp"
+                    android:text="Choose Object"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="218dp"
+                android:layout_height="49dp"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/objectName_tv" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

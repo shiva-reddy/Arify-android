@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -55,6 +54,33 @@ public class ApiClient {
 
     /**
      * Upload image target to a scene
+     * @param sceneName
+     */
+    public void createScene(String sceneName){
+        if(listScenes().results.stream().anyMatch(scene -> scene.name.equals(sceneName))){
+            return;
+        }
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("scene_name", sceneName)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(BASE_URL + "/scenes/create_new")
+                .post(requestBody)
+                .build();
+
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Upload image target to a scene
      * @param scene
      * @param imageTargetName
      * @param imageTargetFile
@@ -68,8 +94,10 @@ public class ApiClient {
                 .addFormDataPart("file", imageTargetFile.getName(), RequestBody.create(MEDIA_TYPE_PNG, imageTargetFile))
                 .build();
 
-        Request request = new Request.Builder()
-                .url(BASE_URL + "/" + scene + "/upload_image")
+
+        Request request = new Request.Builder().addHeader("accept","*/*").addHeader("accept-encoding"
+                ,"gzip, deflate")
+                .url( BASE_URL + "/scenes/" + scene + "/upload_image")
                 .post(requestBody)
                 .build();
 
@@ -88,7 +116,7 @@ public class ApiClient {
      */
     public void linkImageTargetToARObjectInScene(String scene, String arObjectName, String imageTargetName){
         Request request = new Request.Builder()
-                .url(BASE_URL + "/" + scene + "/link_image_with_ar_object")
+                .url(BASE_URL + "/scenes/" + scene + "/link_image_with_ar_object")
                 .post(new FormBody.Builder()
                         .add("image_name", imageTargetName)
                         .add("ar_object_name", arObjectName)
@@ -113,10 +141,12 @@ public class ApiClient {
     }
 
     public Map<ViroImageTarget, List<ViroArObject>> getImageTargetVsArObjectList(String sceneName){
-        return listLinksForScene(sceneName)
+        Map<ImageTarget, List<LinkResult>> collectorsResult = listLinksForScene(sceneName)
                 .results
                 .stream()
-                .collect(Collectors.groupingBy(ApiClient.LinkResult::imageTargetName))
+                .collect(Collectors.groupingBy(ApiClient.LinkResult::imageTarget));
+
+        return collectorsResult
                 .entrySet().stream().collect(
                         Collectors.toMap(e->{
                             ViroImageTarget viroImageTarget = new ViroImageTarget();
@@ -142,6 +172,9 @@ public class ApiClient {
         viroArObject.scaleX = getOrDefault(ar_object.scale_x, 0.1f);
         viroArObject.scaleY = getOrDefault(ar_object.scale_y, 0.1f);
         viroArObject.scaleZ = getOrDefault(ar_object.scale_z, 0.1f);
+        viroArObject.XOffset = getOrDefault(ar_object.pos_offset_x, 0.0f);
+        viroArObject.YOffset = getOrDefault(ar_object.pos_offset_y, 0.0f);
+        viroArObject.ZOffset = getOrDefault(ar_object.pos_offset_z, 0.0f);
         viroArObject.rotX = getOrDefault(ar_object.rot_x, 0.0f);
         viroArObject.rotZ = getOrDefault(ar_object.rot_z,0.0f);
         viroArObject.XOffset = getOrDefault(ar_object.pos_offset_x, 0.0f);
@@ -186,7 +219,7 @@ public class ApiClient {
 
     public static void main(String[] args) throws IOException, JSONException {
         ApiClient apiClient = new ApiClient();
-        apiClient.listLinksForScene("scene_1");
+        apiClient.getImageTargetVsArObjectList("scene_1");
     }
 
     public String get(String endPoint) {
@@ -213,8 +246,18 @@ public class ApiClient {
         String link;
 
         @Override
+        public int hashCode(){
+            return name.hashCode();
+        }
+
+        @Override
+        public String toString(){
+            return name;
+        }
+
+        @Override
         public boolean equals(Object obj){
-            return (obj instanceof ImageTarget && ((ImageTarget) obj).name.equals(this.name));
+            return ((ImageTarget) obj).name.equals(name);
         }
     }
 
@@ -246,7 +289,7 @@ public class ApiClient {
         ImageTarget image_target;
         ArObject ar_object;
 
-        public ImageTarget imageTargetName(){
+        public ImageTarget imageTarget(){
             return image_target;
         }
     }
