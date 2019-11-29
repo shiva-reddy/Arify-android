@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
 
     <application
         android:allowBackup="true"
@@ -18,10 +22,13 @@
             android:name=".ImageTargetListActivity"
             android:label="@string/title_activity_image_target_list"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".CameraTestActivity" />
+
+        <activity android:name=".AddTarget"></activity>
+        <activity android:name=".CameraTestActivity"></activity>
         <activity android:name=".ArTestActivity" />
         <activity android:name=".SceneListActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,7 +43,7 @@
         <activity
             android:name=".ViroActivityAR"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"></activity>
 
         <meta-data
             android:name="com.google.ar.core"

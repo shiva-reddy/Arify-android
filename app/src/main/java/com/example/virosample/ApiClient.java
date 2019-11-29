@@ -95,8 +95,10 @@ public class ApiClient {
                 .addFormDataPart("file", imageTargetFile.getName(), RequestBody.create(MEDIA_TYPE_PNG, imageTargetFile))
                 .build();
 
-        Request request = new Request.Builder()
-                .url(BASE_URL + "/scenes/" + scene + "/upload_image")
+
+        Request request = new Request.Builder().addHeader("accept","*/*").addHeader("accept-encoding"
+                ,"gzip, deflate")
+                .url( BASE_URL + "/scenes/" + scene + "/upload_image")
                 .post(requestBody)
                 .build();
 
