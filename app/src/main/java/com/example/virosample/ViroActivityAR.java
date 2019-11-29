@@ -65,6 +65,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
     private Map<String, ViroArObject> nameVsArObjectMap = new HashMap<>();
 
+    private List<String> activeImageTargets = new ArrayList<>();
+
     // +---------------------------------------------------------------------------+
     //  Initialization
     // +---------------------------------------------------------------------------+
@@ -88,8 +90,17 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         });
         setContentView(mViroView);
         View.inflate(this, R.layout.ar_controls, ((ViewGroup) mViroView));
+        findViewById(R.id.reload).setOnClickListener((v) -> removeActiveObjects());
     }
 
+    public void removeActiveObjects(){
+        mTargetedNodesMap.values().stream()
+                .filter(pair -> activeImageTargets.contains(pair.first.getId()))
+                .forEach(pair -> {
+                    activeImageTargets.remove(pair.first.getId());
+                    pair.second.forEach(node -> node.setVisible(false));
+                });
+    }
 
     private void onRenderCreate() {
         // Create the base ARScene
@@ -143,6 +154,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             Log.i(TAG, "Expected key " + anchorId + " not found");
             return;
         }
+        activeImageTargets.add(anchorId);
         Toast.makeText(this, "Anchor found for " + toName(anchorId), Toast.LENGTH_LONG).show();
         makeVisible(anchor, mTargetedNodesMap.get(anchorId).second);
     }
