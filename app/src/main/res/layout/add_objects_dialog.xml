@@ -22,7 +22,7 @@
             android:layout_height="match_parent">
 
             <ImageButton
-                android:id="@+id/objects_fullscreen_dialog_close"
+                android:id="@+id/edit_objects_fullscreen_dialog_close"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -36,13 +36,13 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
-                android:layout_toEndOf="@id/objects_fullscreen_dialog_close"
+                android:layout_toEndOf="@id/edit_objects_fullscreen_dialog_close"
                 android:text="Add AR Objects"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/objects_fullscreen_dialog_action"
+                android:id="@+id/edit_objects_fullscreen_dialog_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -68,33 +68,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/objectsWrapper"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30sp"
-                android:layout_marginTop="15sp"
-                android:hint="Object Name"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="5dp"
-                app:boxCornerRadiusBottomStart="5dp"
-                app:boxCornerRadiusTopEnd="5dp"
-                app:boxCornerRadiusTopStart="5dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/objects_editText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:inputType="text"
-                    android:textSize="35sp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
             <LinearLayout
                 android:id="@+id/objectName_tv"
                 android:layout_width="match_parent"
@@ -105,7 +78,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/objectsWrapper">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
 
@@ -124,287 +97,6 @@
                 android:layout_marginStart="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/objectName_tv" />
-
-            <LinearLayout
-                android:id="@+id/scale_title_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="3"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/spinner">
-
-                <TextView
-                    android:id="@+id/scaleName_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp"
-                    android:text="Choose Scale"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/objectsWrapper" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/scale_values_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="3"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/scale_title_linear_layout">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/scaleXWrapper"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="30sp"
-                    android:layout_marginTop="15sp"
-                    android:hint="X"
-                    app:boxBackgroundMode="filled">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/scaleX_editText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:inputType="number"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="16dp"
-                        android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/scaleYWrapper"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="30sp"
-                    android:layout_marginTop="15sp"
-                    android:hint="Y"
-                    app:boxBackgroundMode="filled">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/scaleY_editText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="16dp"
-                        android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/scaleZWrapper"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="30sp"
-                    android:layout_marginTop="15sp"
-                    android:hint="Z"
-                    app:boxBackgroundMode="filled">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/scaleZ_editText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:inputType="number"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="16dp"
-                        android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/rotation_title_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="3"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/scale_values_linear_layout">
-
-                <TextView
-                    android:id="@+id/rotationName_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp"
-                    android:text="Choose Rotation"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="parent" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/rotation_values_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="2"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rotation_title_linear_layout">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/roationXWrapper"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="30sp"
-                    android:layout_marginTop="15sp"
-                    android:hint="X"
-                    app:boxBackgroundMode="filled">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/roationX_editText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:inputType="number"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="16dp"
-                        android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/rotationYWrapper"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="30sp"
-                    android:layout_marginTop="15sp"
-                    android:hint="Y"
-                    app:boxBackgroundMode="filled">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/rotationY_editText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:inputType="number"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="16dp"
-                        android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/offset_title_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="3"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rotation_values_linear_layout">
-
-                <TextView
-                    android:id="@+id/offset_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp"
-                    android:inputType="number"
-                    android:text="Choose Offset"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="parent" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/offest_values_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="3"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/offset_title_linear_layout">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/offsetXWrapper"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="30sp"
-                    android:layout_marginTop="15sp"
-                    android:hint="X"
-                    app:boxBackgroundMode="filled">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/offsetX_editText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:inputType="number"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="16dp"
-                        android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/offsetYWrapper"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="30sp"
-                    android:layout_marginTop="15sp"
-                    android:hint="Y"
-                    app:boxBackgroundMode="filled">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/offsetY_editText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:inputType="number"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="16dp"
-                        android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/offsetZWrapper"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="30sp"
-                    android:layout_marginTop="15sp"
-                    android:hint="Z"
-                    app:boxBackgroundMode="filled">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/offsetZ_editText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:inputType="number"
-                        android:layout_marginTop="24dp"
-                        android:layout_marginEnd="16dp"
-                        android:textSize="15sp" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

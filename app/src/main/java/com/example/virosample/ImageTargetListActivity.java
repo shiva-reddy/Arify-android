@@ -93,29 +93,72 @@ public class ImageTargetListActivity extends AppCompatActivity {
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo){
         super.onCreateContextMenu(menu, view, menuInfo);
 
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.image_target_context_menu, menu);
-        menu.setHeaderTitle("Options");
+
+
+        ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+
+        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+        int groupPosition = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+        int childPosition = ExpandableListView.getPackedPositionChild(info.packedPosition);
+
+        // Show context menu for groups
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.image_target_context_menu, menu);
+            menu.setHeaderTitle("Options");
+
+            // Show context menu for children
+        } else if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.ar_objects_context_menu, menu);
+            menu.setHeaderTitle("Options");
+        }
+
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         ExpandableListView.ExpandableListContextMenuInfo menuPosition = (ExpandableListView.ExpandableListContextMenuInfo) item.getMenuInfo();
-        String imageTargetName = (String) expandableListView.getItemAtPosition(ExpandableListView.getPackedPositionGroup(menuPosition.packedPosition));
 
-        switch (item.getItemId()) {
+        int type = ExpandableListView.getPackedPositionType(menuPosition.packedPosition);
+        int groupPosition = ExpandableListView.getPackedPositionGroup(menuPosition.packedPosition);
+        int childPosition = ExpandableListView.getPackedPositionChild(menuPosition.packedPosition);
 
-            case R.id.action_one:
-                this.addARObjects(imageTargetName);
-                return true;
-            default:
-                return super.onContextItemSelected(item);
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+            String imageTargetName = (String) expandableListView.getItemAtPosition(ExpandableListView.getPackedPositionGroup(menuPosition.packedPosition));
+            switch (item.getItemId()) {
+
+                case R.id.action_one:
+                    this.addARObjects(imageTargetName);
+                    return true;
+                default:
+                    return super.onContextItemSelected(item);
+            }
+        } else if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+
+            ViroArObject arObjectNames = imageTargetVsObjLocationMap.get(
+                    imageTargetList.get(groupPosition)).get(
+                    childPosition);
+            this.editARObjects(arObjectNames.objectName);
         }
+
+        return super.onContextItemSelected(item);
     }
 
     public void addARObjects(String imageTargetName){
         DialogFragment dialog = new AddARObjectsFullscreenDialog(imageTargetName);
         ((AddARObjectsFullscreenDialog) dialog).setCallback(new AddARObjectsFullscreenDialog.Callback() {
+            @Override
+            public void onActionClick(String name) {
+                Toast.makeText(mContext,name, Toast.LENGTH_SHORT).show();
+            }
+        });
+        dialog.show(getSupportFragmentManager(), "tag");
+    }
+
+    public void editARObjects(String arObjectName){
+        DialogFragment dialog = new EditARObjectsFullscreenDialog(arObjectName);
+        ((EditARObjectsFullscreenDialog) dialog).setCallback(new EditARObjectsFullscreenDialog.Callback() {
             @Override
             public void onActionClick(String name) {
                 Toast.makeText(mContext,name, Toast.LENGTH_SHORT).show();
