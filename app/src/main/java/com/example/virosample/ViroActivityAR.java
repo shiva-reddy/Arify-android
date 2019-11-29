@@ -48,8 +48,10 @@ import com.viro.core.ViroView;
 import com.viro.core.ViroViewARCore;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -58,41 +60,14 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     private static final String TAG = "my_viro_log";
     private ViroView mViroView;
     private ARScene mScene;
-    private Map<String, Pair<ARImageTarget, Node>> mTargetedNodesMap;
-    private Map<ImageTarget, ArObject> imageTargetVsObjectLocation = new HashMap<>();
+
+    private Map<String, Pair<ARImageTarget, List<Node>>> mTargetedNodesMap;
+
+    private Map<ImageTarget, List<ArObject>> imageTargetVsObjects = new HashMap<>();
+
     private Map<String, String> keyVsName = new HashMap<>();
-    private Map<String, Node> keyVObjectNodeMap = new HashMap<>();
-    private Map<String, Vector> keyVsScaleVectorMap = new HashMap<>();
 
-
-//    private Material preloadCarColorTextures(Node node){
-//        final Texture metallicTexture = new Texture(getBitmapFromAssets("object_car_main_Metallic.png"),
-//                Texture.Format.RGBA8, true, true);
-//        final Texture roughnessTexture = new Texture(getBitmapFromAssets("object_car_main_Roughness.png"),
-//                Texture.Format.RGBA8, true, true);
-//
-//        Material material = new Material();
-//        material.setMetalnessMap(metallicTexture);
-//        material.setRoughnessMap(roughnessTexture);
-//        material.setLightingModel(Material.LightingModel.PHYSICALLY_BASED);
-//        node.getGeometry().setMaterials(Arrays.asList(material));
-//
-//        // Loop through color.
-//        for (CAR_MODEL model : CAR_MODEL.values()) {
-//            Bitmap carBitmap = getBitmapFromAssets(model.getCarSrc());
-//            final Texture carTexture = new Texture(carBitmap, Texture.Format.RGBA8, true, true);
-//            mCarColorTextures.put(model, carTexture);
-//
-//            // Preload our textures into the model
-//            material.setDiffuseTexture(carTexture);
-//        }
-//
-//        material.setDiffuseTexture(mCarColorTextures.get(CAR_MODEL.WHITE));
-//        return material;
-//    }
-
-
-
+    private Map<String, ArObject> nameVsArObjectMap = new HashMap<>();
 
     // +---------------------------------------------------------------------------+
     //  Initialization
@@ -101,8 +76,21 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTargetedNodesMap = new HashMap<String, Pair<ARImageTarget, Node>>();
+        mTargetedNodesMap = new HashMap<String, Pair<ARImageTarget, List<Node>>>();
         imageTargetVsObjectLocation = ArTestActivity.imageTargetVsObjLocationMap;
+
+        imageTargetVsObjectLocation.entrySet().forEach(e-> {
+            List<ArObject> objList = new ArrayList<>();
+            ArObject val1 = e.getValue();
+            val1.objectName+="_1";
+            objList.add(val1);
+//
+            ArObject val2 = e.getValue();
+            val2.objectName+="_2";
+            objList.add(val2);
+            imageTargetVsObjects.put(e.getKey(), objList);
+        });
+
         mViroView = new ViroViewARCore(this, new ViroViewARCore.StartupListener() {
             @Override
             public void onSuccess() {
@@ -124,38 +112,29 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         mScene = new ARScene();
         mScene.setListener(this);
         mViroView.setScene(mScene);
-        imageTargetVsObjectLocation.entrySet().forEach(e ->{
+        imageTargetVsObjects.entrySet().forEach(e -> {
             linkTargetWithNode(e.getKey(), e.getValue());
         });
     }
 
-    public void linkTargetWithNode(ImageTarget imageTarget, ArObject arObject){
-
+    public void linkTargetWithNode(ImageTarget imageTarget, List<ArObject> linkedArObjects){
         Bitmap imageTargetBtm = imageTarget.btm;
-
         ARImageTarget arImageTarget = new ARImageTarget(imageTargetBtm, ARImageTarget.Orientation.Up, 0.188f);
         mScene.addARImageTarget(arImageTarget);
+        String key = arImageTarget.getId();
+        keyVsName.put(key, imageTarget.name);
 
-        Node arObjectNode = new Node();
-        initARModel(arObjectNode, arObject, arImageTarget.getId());
-        initSceneLights(arObjectNode);
-        arObjectNode.setVisible(false);
-        mScene.getRootNode().addChildNode(arObjectNode);
+        List<Node> nodes = new ArrayList<>();
 
-        linkTargetWithNode(arImageTarget, imageTarget.name,arObjectNode, arObject.objectName);
-    }
-
-    /*
-     Link the given ARImageTarget with the provided Node. When the ARImageTarget is
-     found in the scene (by onAnchorFound below), the Node will be made visible and
-     the target's transformations will be applied to the Node, thereby rendering the
-     Node over the target.
-     */
-    private void linkTargetWithNode(ARImageTarget imageToDetect, String imageTargetName, Node nodeToRender, String arObjectName){
-        String key = imageToDetect.getId();
-        keyVsName.put(key, imageTargetName);
-        Log.i(TAG, "Adding to key " + key);
-        mTargetedNodesMap.put(key, new Pair(imageToDetect, nodeToRender));
+        for(ArObject arObject : linkedArObjects){
+            Node arObjectNode = new Node();
+            initARModel(arObjectNode, arObject, arImageTarget.getId());
+            initSceneLights(arObjectNode);
+            arObjectNode.setVisible(false);
+            mScene.getRootNode().addChildNode(arObjectNode);
+            nodes.add(arObjectNode);
+        }
+        mTargetedNodesMap.put(key, new Pair<>(arImageTarget, nodes));
     }
 
     // +---------------------------------------------------------------------------+
@@ -173,43 +152,55 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     @Override
     public void onAnchorFound(ARAnchor anchor, ARNode arNode) {
         String anchorId = anchor.getAnchorId();
-
         if(toName(anchorId) == null){
             return;
         }
-        Node objectNode = keyVObjectNodeMap.get(anchorId);
-        Log.i(TAG, "Anchor " + toName(anchorId) + " found, Loading model " + objectNode.getName());
-        Toast.makeText(this, "Anchor " + toName(anchorId) + " found. Loading " + objectNode.getName(), Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             Log.i(TAG, "Expected key " + anchorId + " not found");
             return;
         }
-        Log.i(TAG, "Anchor found at " + anchor.getPosition());
+        Toast.makeText(this, "Anchor found for " + toName(anchorId), Toast.LENGTH_LONG).show();
+        makeVisible(anchor, mTargetedNodesMap.get(anchorId).second);
+    }
 
-        Node imageTargetNode = mTargetedNodesMap.get(anchorId).second;
-        Vector rot = new Vector(0,anchor.getRotation().y, 0);
-        imageTargetNode.setPosition(anchor.getPosition());
-        imageTargetNode.setRotation(rot);
-        imageTargetNode.setVisible(true);
-        animateModelVisible(imageTargetNode, keyVsScaleVectorMap.get(anchorId));
+    public void makeVisible(ARAnchor anchor, List<Node> arNodes){
+        arNodes.forEach(arObjectNode -> {
+            ArObject arObject = nameVsArObjectMap.get(arObjectNode.getName());
 
-        // Stop the node from moving in place once found
-//        ARImageTarget imgTarget = mTargetedNodesMap.get(anchorId).first;
-//        mScene.removeARImageTarget(imgTarget);
-//        mTargetedNodesMap.remove(anchorId);
+            //Position vector
+            Vector pos = anchor.getPosition();
+            pos.x += arObject.XOffset;
+            pos.y += arObject.YOffset;
+            pos.z += arObject.ZOffset;
+            arObjectNode.setPosition(pos);
+
+            //Rotation vector
+            Vector rot = new Vector(arObject.rotX, anchor.getRotation().y, arObject.rotZ);
+            arObjectNode.setRotation(rot);
+
+            //Scale vector
+            Vector scale = new Vector();
+            scale.x = arObject.scaleX;
+            scale.y = arObject.scaleY;
+            scale.z = arObject.scaleZ;
+            arObjectNode.setScale(scale);
+
+            arObjectNode.setVisible(true);
+
+            Log.i(TAG, "Made object  "  + arObject.objectName + " visible");
+        });
     }
 
     @Override
     public void onAnchorRemoved(ARAnchor anchor, ARNode arNode) {
         String anchorId = anchor.getAnchorId();
         Log.i(TAG, "Anchor " + toName(anchorId) + " removed");
-//        Toast.makeText(this, "Anchor " + toName(anchorId) + " removed", Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             return;
         }
-
-        Node imageTargetNode = mTargetedNodesMap.get(anchorId).second;
-        imageTargetNode.setVisible(false);
+        mTargetedNodesMap.get(anchorId).second.forEach(arObject ->{
+            arObject.setVisible(false);
+        });
     }
 
     public String toName(String anchorId){
@@ -232,14 +223,6 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     private void initARModel(Node groupNode,ArObject arObject, String key) {
         // Creation of ObjectJni to the right
         Object3D objectNode = new Object3D();
-//        Log.i(TAG, "Loading with scale ["
-//                + arObject.scaleX + ", "
-//                + arObject.scaleY + ", "
-//                + arObject.scaleZ + "]");
-//        Toast.makeText(this, "Loading with scale ["
-//                + arObject.scaleX + ", "
-//                + arObject.scaleY + ", "
-//                + arObject.scaleZ + "]", Toast.LENGTH_LONG).show();
 
         Vector scale = new Vector(arObject.scaleX, arObject.scaleY, arObject.scaleZ);
         objectNode.loadModel(mViroView.getViroContext(), Uri.parse(arObject.objectWebLink), arObject.type, new AsyncObject3DListener() {
@@ -248,8 +231,6 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                 Log.i(TAG, "Model " + arObject.objectName + " successfully loaded");
                 if(arObject.mtlWebLink != null){
                     loadTextures(object, arObject.mtlWebLink);
-                } else{
-                    Toast.makeText(ViroActivityAR.this, "No materials to load !!", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -275,12 +256,9 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                 // No-op.
             }
         });
-        keyVObjectNodeMap.put(key, objectNode);
-        keyVsScaleVectorMap.put(key, scale);
+        nameVsArObjectMap.put(arObject.objectName, arObject);
         objectNode.setName(arObject.objectName);
     }
-
-
 
     private void loadTextures(Node node, String mtlWebLink) {
         try {
@@ -335,19 +313,19 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
     private void animateScale(Node node, long duration, Vector targetScale,
                               AnimationTimingFunction fcn, final Runnable runnable) {
-        AnimationTransaction.begin();
-        AnimationTransaction.setAnimationDuration(duration);
-        AnimationTransaction.setTimingFunction(fcn);
+//        AnimationTransaction.begin();
+//        AnimationTransaction.setAnimationDuration(duration);
+//        AnimationTransaction.setTimingFunction(fcn);
         node.setScale(targetScale);
-        if (runnable != null){
-            AnimationTransaction.setListener(new AnimationTransaction.Listener() {
-                @Override
-                public void onFinish(AnimationTransaction animationTransaction) {
-                    runnable.run();
-                }
-            });
-        }
-        AnimationTransaction.commit();
+//        if (runnable != null){
+//            AnimationTransaction.setListener(new AnimationTransaction.Listener() {
+//                @Override
+//                public void onFinish(AnimationTransaction animationTransaction) {
+//                    runnable.run();
+//                }
+//            });
+//        }
+//        AnimationTransaction.commit();
     }
 
     private void animateModelVisible(Node model, Vector targetScale) {

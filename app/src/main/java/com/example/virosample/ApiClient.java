@@ -162,7 +162,7 @@ public class ApiClient {
     public static class ArObject{
         String name;
         String link;
-        Float scale_x, scale_y, scale_z, rot_x, rot_y, rot_z;
+        Float scale_x, scale_y, scale_z, rot_x, rot_z;
         String model_type;
         String mtl_link;
 

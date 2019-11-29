@@ -67,7 +67,6 @@ public class ArTestActivity extends AppCompatActivity {
                             arObject.scaleY = getOrDefault(link.ar_object.scale_y, 0.1f);
                             arObject.scaleZ = getOrDefault(link.ar_object.scale_z, 0.1f);
                             arObject.rotX = getOrDefault(link.ar_object.rot_x, 0.0f);
-                            arObject.rotY = getOrDefault(link.ar_object.rot_y, 0.0f);
                             arObject.rotZ = getOrDefault(link.ar_object.rot_z,0.0f);
                             return arObject;
                         }

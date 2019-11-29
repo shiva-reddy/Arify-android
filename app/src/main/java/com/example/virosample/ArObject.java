@@ -11,8 +11,10 @@ public class ArObject {
     public Float scaleX;
     public Float scaleY;
     public Float scaleZ;
+    public Float XOffset;
+    public Float YOffset;
+    public Float ZOffset;
     public Float rotX;
-    public Float rotY;
     public Float rotZ;
     String objectName;
 }
