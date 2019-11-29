@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -114,10 +113,13 @@ public class ApiClient {
     }
 
     public Map<ViroImageTarget, List<ViroArObject>> getImageTargetVsArObjectList(String sceneName){
-        return listLinksForScene(sceneName)
+
+        Map<ImageTarget, List<LinkResult>> collectorsResult = listLinksForScene(sceneName)
                 .results
                 .stream()
-                .collect(Collectors.groupingBy(ApiClient.LinkResult::imageTargetName))
+                .collect(Collectors.groupingBy(ApiClient.LinkResult::imageTarget));
+
+        return collectorsResult
                 .entrySet().stream().collect(
                         Collectors.toMap(e->{
                             ViroImageTarget viroImageTarget = new ViroImageTarget();
@@ -214,6 +216,16 @@ public class ApiClient {
         public int hashCode(){
             return name.hashCode();
         }
+
+        @Override
+        public String toString(){
+            return name;
+        }
+
+        @Override
+        public boolean equals(Object obj){
+            return ((ImageTarget) obj).name.equals(name);
+        }
     }
 
     public static class ArObject{
@@ -244,7 +256,7 @@ public class ApiClient {
         ImageTarget image_target;
         ArObject ar_object;
 
-        public ImageTarget imageTargetName(){
+        public ImageTarget imageTarget(){
             return image_target;
         }
     }
