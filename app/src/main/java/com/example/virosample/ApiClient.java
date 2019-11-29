@@ -1,5 +1,7 @@
 package com.example.virosample;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -9,10 +11,13 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
@@ -44,10 +49,35 @@ public class ApiClient {
     public ScenesListResult listScenes(){
         String resp = get("/scenes/");
         ScenesListResult listResult = gson.fromJson(resp, ScenesListResult.class);
-        for(SceneResult result : listResult.results){
-            System.out.println(result.name);
-        }
+
         return listResult;
+    }
+
+    /**
+     * Upload image target to a scene
+     * @param sceneName
+     */
+    public void createScene(String sceneName){
+        if(listScenes().results.stream().anyMatch(scene -> scene.name.equals(sceneName))){
+            return;
+        }
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("scene_name", sceneName)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(BASE_URL + "/scenes/create_new")
+                .post(requestBody)
+                .build();
+
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -64,6 +94,7 @@ public class ApiClient {
                 .addFormDataPart("image_name", imageTargetName)
                 .addFormDataPart("file", imageTargetFile.getName(), RequestBody.create(MEDIA_TYPE_PNG, imageTargetFile))
                 .build();
+
 
         Request request = new Request.Builder().addHeader("accept","*/*").addHeader("accept-encoding"
                 ,"gzip, deflate")
@@ -110,6 +141,57 @@ public class ApiClient {
         return listLinkResult;
     }
 
+    public Map<ViroImageTarget, List<ViroArObject>> getImageTargetVsArObjectList(String sceneName){
+
+        Map<ImageTarget, List<LinkResult>> collectorsResult = listLinksForScene(sceneName)
+                .results
+                .stream()
+                .collect(Collectors.groupingBy(ApiClient.LinkResult::imageTarget));
+
+        return collectorsResult
+                .entrySet().stream().collect(
+                        Collectors.toMap(e->{
+                            ViroImageTarget viroImageTarget = new ViroImageTarget();
+                            viroImageTarget.btm = getImageAssetUri(e.getKey().link);
+                            viroImageTarget.name = e.getKey().name;
+                            return viroImageTarget;
+                        }, e -> {
+                            List<ViroArObject> viroArObjects = new ArrayList<>();
+                            e.getValue().forEach(linkResult -> {
+                                viroArObjects.add(toArObject(linkResult.ar_object));
+                            });
+                            return viroArObjects;
+                        })
+                );
+    }
+
+    private ViroArObject toArObject(ApiClient.ArObject ar_object) {
+        ViroArObject viroArObject = new ViroArObject();
+        viroArObject.objectWebLink = ar_object.link;
+        viroArObject.objectName = ar_object.name;
+        viroArObject.mtlWebLink = ar_object.mtl_link;
+        viroArObject.type = ar_object.objType();
+        viroArObject.scaleX = getOrDefault(ar_object.scale_x, 0.1f);
+        viroArObject.scaleY = getOrDefault(ar_object.scale_y, 0.1f);
+        viroArObject.scaleZ = getOrDefault(ar_object.scale_z, 0.1f);
+        viroArObject.rotX = getOrDefault(ar_object.rot_x, 0.0f);
+        viroArObject.rotZ = getOrDefault(ar_object.rot_z,0.0f);
+        return viroArObject;
+    }
+
+    private static Float getOrDefault(Float val, Float def){
+        return val == null? def : val;
+    }
+
+    public static Bitmap getImageAssetUri(String link) {
+        try {
+            Log.i("my_viro_log", link);
+            URL aUrl = new URL(link);
+            return BitmapFactory.decodeStream((InputStream) aUrl.getContent());
+        } catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * All Ar Objects in a scene
@@ -133,7 +215,7 @@ public class ApiClient {
 
     public static void main(String[] args) throws IOException, JSONException {
         ApiClient apiClient = new ApiClient();
-        apiClient.listLinksForScene("scene_1");
+        apiClient.getImageTargetVsArObjectList("scene_1");
     }
 
     public String get(String endPoint) {
@@ -158,12 +240,27 @@ public class ApiClient {
     public static class ImageTarget{
         String name;
         String link;
+
+        @Override
+        public int hashCode(){
+            return name.hashCode();
+        }
+
+        @Override
+        public String toString(){
+            return name;
+        }
+
+        @Override
+        public boolean equals(Object obj){
+            return ((ImageTarget) obj).name.equals(name);
+        }
     }
 
     public static class ArObject{
         String name;
         String link;
-        Float scale_x, scale_y, scale_z, rot_x, rot_y, rot_z;
+        Float scale_x, scale_y, scale_z, rot_x, rot_z;
         String model_type;
         String mtl_link;
 
@@ -180,9 +277,21 @@ public class ApiClient {
         }
     }
 
+    public class SceneList {
+        String name;
+    }
+
     public static class LinkResult{
         ImageTarget image_target;
         ArObject ar_object;
+
+        public ImageTarget imageTarget(){
+            return image_target;
+        }
+    }
+
+    public static class LinkSceneResults{
+        SceneList sceneName;
     }
 
     public static class ListArObjectsResult{
@@ -198,7 +307,7 @@ public class ApiClient {
     }
 
     public static class ScenesListResult{
-        List<SceneResult> results;
+        List<SceneList> results;
     }
 
 }
