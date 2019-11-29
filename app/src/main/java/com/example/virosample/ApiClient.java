@@ -55,6 +55,33 @@ public class ApiClient {
 
     /**
      * Upload image target to a scene
+     * @param sceneName
+     */
+    public void createScene(String sceneName){
+        if(listScenes().results.stream().anyMatch(scene -> scene.name.equals(sceneName))){
+            return;
+        }
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("scene_name", sceneName)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(BASE_URL + "/scenes/create_new")
+                .post(requestBody)
+                .build();
+
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Upload image target to a scene
      * @param scene
      * @param imageTargetName
      * @param imageTargetFile
