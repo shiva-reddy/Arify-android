@@ -31,9 +31,7 @@ import com.viro.core.ARImageTarget;
 import com.viro.core.ARNode;
 import com.viro.core.ARScene;
 import com.viro.core.AnimationTimingFunction;
-import com.viro.core.AnimationTransaction;
 import com.viro.core.AsyncObject3DListener;
-import com.viro.core.Box;
 import com.viro.core.ClickListener;
 import com.viro.core.ClickState;
 import com.viro.core.Material;
@@ -41,13 +39,11 @@ import com.viro.core.Node;
 import com.viro.core.Object3D;
 import com.viro.core.Spotlight;
 import com.viro.core.Surface;
-import com.viro.core.Text;
 import com.viro.core.Texture;
 import com.viro.core.Vector;
 import com.viro.core.ViroView;
 import com.viro.core.ViroViewARCore;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,11 +59,11 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
     private Map<String, Pair<ARImageTarget, List<Node>>> mTargetedNodesMap;
 
-    private Map<ImageTarget, List<ArObject>> imageTargetVsObjects = new HashMap<>();
+    private Map<ViroImageTarget, List<ViroArObject>> imageTargetVsObjects = new HashMap<>();
 
     private Map<String, String> keyVsName = new HashMap<>();
 
-    private Map<String, ArObject> nameVsArObjectMap = new HashMap<>();
+    private Map<String, ViroArObject> nameVsArObjectMap = new HashMap<>();
 
     // +---------------------------------------------------------------------------+
     //  Initialization
@@ -77,19 +73,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTargetedNodesMap = new HashMap<String, Pair<ARImageTarget, List<Node>>>();
-        imageTargetVsObjectLocation = ArTestActivity.imageTargetVsObjLocationMap;
-
-        imageTargetVsObjectLocation.entrySet().forEach(e-> {
-            List<ArObject> objList = new ArrayList<>();
-            ArObject val1 = e.getValue();
-            val1.objectName+="_1";
-            objList.add(val1);
-//
-            ArObject val2 = e.getValue();
-            val2.objectName+="_2";
-            objList.add(val2);
-            imageTargetVsObjects.put(e.getKey(), objList);
-        });
+        imageTargetVsObjects = ArTestActivity.imageTargetVsArObjectListMap;
 
         mViroView = new ViroViewARCore(this, new ViroViewARCore.StartupListener() {
             @Override
@@ -117,18 +101,18 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         });
     }
 
-    public void linkTargetWithNode(ImageTarget imageTarget, List<ArObject> linkedArObjects){
-        Bitmap imageTargetBtm = imageTarget.btm;
+    public void linkTargetWithNode(ViroImageTarget viroImageTarget, List<ViroArObject> linkedViroArObjects){
+        Bitmap imageTargetBtm = viroImageTarget.btm;
         ARImageTarget arImageTarget = new ARImageTarget(imageTargetBtm, ARImageTarget.Orientation.Up, 0.188f);
         mScene.addARImageTarget(arImageTarget);
         String key = arImageTarget.getId();
-        keyVsName.put(key, imageTarget.name);
+        keyVsName.put(key, viroImageTarget.name);
 
         List<Node> nodes = new ArrayList<>();
 
-        for(ArObject arObject : linkedArObjects){
+        for(ViroArObject viroArObject : linkedViroArObjects){
             Node arObjectNode = new Node();
-            initARModel(arObjectNode, arObject, arImageTarget.getId());
+            initARModel(arObjectNode, viroArObject, arImageTarget.getId());
             initSceneLights(arObjectNode);
             arObjectNode.setVisible(false);
             mScene.getRootNode().addChildNode(arObjectNode);
@@ -165,29 +149,29 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
     public void makeVisible(ARAnchor anchor, List<Node> arNodes){
         arNodes.forEach(arObjectNode -> {
-            ArObject arObject = nameVsArObjectMap.get(arObjectNode.getName());
+            ViroArObject viroArObject = nameVsArObjectMap.get(arObjectNode.getName());
 
             //Position vector
             Vector pos = anchor.getPosition();
-            pos.x += arObject.XOffset;
-            pos.y += arObject.YOffset;
-            pos.z += arObject.ZOffset;
+            pos.x += viroArObject.XOffset;
+            pos.y += viroArObject.YOffset;
+            pos.z += viroArObject.ZOffset;
             arObjectNode.setPosition(pos);
 
             //Rotation vector
-            Vector rot = new Vector(arObject.rotX, anchor.getRotation().y, arObject.rotZ);
+            Vector rot = new Vector(viroArObject.rotX, anchor.getRotation().y, viroArObject.rotZ);
             arObjectNode.setRotation(rot);
 
             //Scale vector
             Vector scale = new Vector();
-            scale.x = arObject.scaleX;
-            scale.y = arObject.scaleY;
-            scale.z = arObject.scaleZ;
+            scale.x = viroArObject.scaleX;
+            scale.y = viroArObject.scaleY;
+            scale.z = viroArObject.scaleZ;
             arObjectNode.setScale(scale);
 
             arObjectNode.setVisible(true);
 
-            Log.i(TAG, "Made object  "  + arObject.objectName + " visible");
+            Log.i(TAG, "Made object  "  + viroArObject.objectName + " visible");
         });
     }
 
@@ -220,17 +204,17 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
      Init, loads the the Tesla Object3D, and attaches it to the passed in groupNode.
      */
 
-    private void initARModel(Node groupNode,ArObject arObject, String key) {
+    private void initARModel(Node groupNode, ViroArObject viroArObject, String key) {
         // Creation of ObjectJni to the right
         Object3D objectNode = new Object3D();
 
-        Vector scale = new Vector(arObject.scaleX, arObject.scaleY, arObject.scaleZ);
-        objectNode.loadModel(mViroView.getViroContext(), Uri.parse(arObject.objectWebLink), arObject.type, new AsyncObject3DListener() {
+        Vector scale = new Vector(viroArObject.scaleX, viroArObject.scaleY, viroArObject.scaleZ);
+        objectNode.loadModel(mViroView.getViroContext(), Uri.parse(viroArObject.objectWebLink), viroArObject.type, new AsyncObject3DListener() {
             @Override
             public void onObject3DLoaded(final Object3D object, final Object3D.Type type) {
-                Log.i(TAG, "Model " + arObject.objectName + " successfully loaded");
-                if(arObject.mtlWebLink != null){
-                    loadTextures(object, arObject.mtlWebLink);
+                Log.i(TAG, "Model " + viroArObject.objectName + " successfully loaded");
+                if(viroArObject.mtlWebLink != null){
+                    loadTextures(object, viroArObject.mtlWebLink);
                 }
             }
 
@@ -256,8 +240,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                 // No-op.
             }
         });
-        nameVsArObjectMap.put(arObject.objectName, arObject);
-        objectNode.setName(arObject.objectName);
+        nameVsArObjectMap.put(viroArObject.objectName, viroArObject);
+        objectNode.setName(viroArObject.objectName);
     }
 
     private void loadTextures(Node node, String mtlWebLink) {

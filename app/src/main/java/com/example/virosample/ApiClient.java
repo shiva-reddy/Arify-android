@@ -1,5 +1,7 @@
 package com.example.virosample;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -9,10 +11,14 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
@@ -107,6 +113,54 @@ public class ApiClient {
         return listLinkResult;
     }
 
+    public Map<ViroImageTarget, List<ViroArObject>> getImageTargetVsArObjectList(String sceneName){
+        return listLinksForScene("sceneName")
+                .results
+                .stream()
+                .collect(Collectors.groupingBy(ApiClient.LinkResult::imageTargetName))
+                .entrySet().stream().collect(
+                        Collectors.toMap(e->{
+                            ViroImageTarget viroImageTarget = new ViroImageTarget();
+                            viroImageTarget.btm = getImageAssetUri(e.getKey().link);
+                            viroImageTarget.name = e.getKey().name;
+                            return viroImageTarget;
+                        }, e -> {
+                            List<ViroArObject> viroArObjects = new ArrayList<>();
+                            e.getValue().forEach(linkResult -> {
+                                viroArObjects.add(toArObject(linkResult.ar_object));
+                            });
+                            return viroArObjects;
+                        })
+                );
+    }
+
+    private ViroArObject toArObject(ApiClient.ArObject ar_object) {
+        ViroArObject viroArObject = new ViroArObject();
+        viroArObject.objectWebLink = ar_object.link;
+        viroArObject.objectName = ar_object.name;
+        viroArObject.mtlWebLink = ar_object.mtl_link;
+        viroArObject.type = ar_object.objType();
+        viroArObject.scaleX = getOrDefault(ar_object.scale_x, 0.1f);
+        viroArObject.scaleY = getOrDefault(ar_object.scale_y, 0.1f);
+        viroArObject.scaleZ = getOrDefault(ar_object.scale_z, 0.1f);
+        viroArObject.rotX = getOrDefault(ar_object.rot_x, 0.0f);
+        viroArObject.rotZ = getOrDefault(ar_object.rot_z,0.0f);
+        return viroArObject;
+    }
+
+    private static Float getOrDefault(Float val, Float def){
+        return val == null? def : val;
+    }
+
+    public static Bitmap getImageAssetUri(String link) {
+        try {
+            Log.i("my_viro_log", link);
+            URL aUrl = new URL(link);
+            return BitmapFactory.decodeStream((InputStream) aUrl.getContent());
+        } catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * All Ar Objects in a scene
@@ -155,6 +209,11 @@ public class ApiClient {
     public static class ImageTarget{
         String name;
         String link;
+
+        @Override
+        public boolean equals(Object obj){
+            return (obj instanceof ImageTarget && ((ImageTarget) obj).name.equals(this.name));
+        }
     }
 
     public static class ArObject{
@@ -184,6 +243,10 @@ public class ApiClient {
     public static class LinkResult{
         ImageTarget image_target;
         ArObject ar_object;
+
+        public ImageTarget imageTargetName(){
+            return image_target;
+        }
     }
 
     public static class LinkSceneResults{

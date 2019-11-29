@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class ImageTargetListActivity extends AppCompatActivity {
 
-    public static Map<ImageTarget, ArObject> imageTargetVsObjLocationMap = new HashMap<>();
+    public static Map<ViroImageTarget, ViroArObject> imageTargetVsObjLocationMap = new HashMap<>();
     private String SCENE_NAME;
 
     @Override
@@ -48,14 +48,14 @@ public class ImageTargetListActivity extends AppCompatActivity {
                 .stream()
                 .collect(Collectors.toMap(
                         link -> {
-                            ImageTarget imageTarget = new ImageTarget();
-                            imageTarget.name = link.image_target.name;
-                            return imageTarget;
+                            ViroImageTarget viroImageTarget = new ViroImageTarget();
+                            viroImageTarget.name = link.image_target.name;
+                            return viroImageTarget;
                         },
                         link ->{
-                            ArObject arObject = new ArObject();
-                            arObject.objectName = link.ar_object.name;
-                            return arObject;
+                            ViroArObject viroArObject = new ViroArObject();
+                            viroArObject.objectName = link.ar_object.name;
+                            return viroArObject;
                         }
                 ));
     }
