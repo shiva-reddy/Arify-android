@@ -96,7 +96,7 @@ public class ApiClient {
                 .build();
 
         Request request = new Request.Builder()
-                .url(BASE_URL + "/" + scene + "/upload_image")
+                .url(BASE_URL + "/scenes/" + scene + "/upload_image")
                 .post(requestBody)
                 .build();
 
@@ -115,7 +115,7 @@ public class ApiClient {
      */
     public void linkImageTargetToARObjectInScene(String scene, String arObjectName, String imageTargetName){
         Request request = new Request.Builder()
-                .url(BASE_URL + "/" + scene + "/link_image_with_ar_object")
+                .url(BASE_URL + "/scenes/" + scene + "/link_image_with_ar_object")
                 .post(new FormBody.Builder()
                         .add("image_name", imageTargetName)
                         .add("ar_object_name", arObjectName)
