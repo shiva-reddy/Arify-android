@@ -7,10 +7,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 public class CameraTestActivity extends AppCompatActivity {
@@ -61,9 +59,15 @@ public class CameraTestActivity extends AppCompatActivity {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
 
             Intent myIntent = new Intent(this, AddTarget.class);
-            myIntent.putExtra("image", photo);
+            myIntent.putExtra("image", RotateBitmap(photo, (float) 90));
             myIntent.putExtra("scene","scene_1");
             startActivity(myIntent);
         }
+    }
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 }
