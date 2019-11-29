@@ -62,7 +62,7 @@ public class ImageTargetListActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.imageTarget_fab);
         fab.setOnClickListener(view -> {
-            //TODO: Call Krunals component here
+
         });
 
         registerForContextMenu(expandableListView);
@@ -129,7 +129,7 @@ public class ImageTargetListActivity extends AppCompatActivity {
             switch (item.getItemId()) {
 
                 case R.id.action_one:
-                    this.addARObjects(imageTargetName);
+                    this.addARObjects(SCENE_NAME, imageTargetName);
                     return true;
                 default:
                     return super.onContextItemSelected(item);
@@ -139,29 +139,30 @@ public class ImageTargetListActivity extends AppCompatActivity {
             ViroArObject arObjectNames = imageTargetVsObjLocationMap.get(
                     imageTargetList.get(groupPosition)).get(
                     childPosition);
-            this.editARObjects(arObjectNames.objectName);
+            this.editARObjects(arObjectNames);
         }
 
         return super.onContextItemSelected(item);
     }
 
-    public void addARObjects(String imageTargetName){
-        DialogFragment dialog = new AddARObjectsFullscreenDialog(imageTargetName);
+    public void addARObjects(String SCENE_NAME, String imageTargetName){
+        DialogFragment dialog = new AddARObjectsFullscreenDialog(SCENE_NAME);
         ((AddARObjectsFullscreenDialog) dialog).setCallback(new AddARObjectsFullscreenDialog.Callback() {
             @Override
-            public void onActionClick(String name) {
-                Toast.makeText(mContext,name, Toast.LENGTH_SHORT).show();
+            public void onActionClick(String arObjectName) {
+                ApiClient.build().linkImageTargetToARObjectInScene(SCENE_NAME,arObjectName,imageTargetName);
+                //Toast.makeText(mContext,name, Toast.LENGTH_SHORT).show();
             }
         });
         dialog.show(getSupportFragmentManager(), "tag");
     }
 
-    public void editARObjects(String arObjectName){
+    public void editARObjects(ViroArObject arObjectName){
         DialogFragment dialog = new EditARObjectsFullscreenDialog(arObjectName);
         ((EditARObjectsFullscreenDialog) dialog).setCallback(new EditARObjectsFullscreenDialog.Callback() {
             @Override
-            public void onActionClick(String name) {
-                Toast.makeText(mContext,name, Toast.LENGTH_SHORT).show();
+            public void onActionClick(ViroArObject newArObject) {
+
             }
         });
         dialog.show(getSupportFragmentManager(), "tag");
