@@ -177,9 +177,6 @@ public class ApiClient {
         viroArObject.ZOffset = getOrDefault(ar_object.pos_offset_z, 0.0f);
         viroArObject.rotX = getOrDefault(ar_object.rot_x, 0.0f);
         viroArObject.rotZ = getOrDefault(ar_object.rot_z,0.0f);
-        viroArObject.XOffset = getOrDefault(ar_object.pos_offset_x, 0.0f);
-        viroArObject.YOffset = getOrDefault(ar_object.pos_offset_y, 0.0f);
-        viroArObject.ZOffset = getOrDefault(ar_object.pos_offset_z, 0.0f);
         return viroArObject;
     }
 

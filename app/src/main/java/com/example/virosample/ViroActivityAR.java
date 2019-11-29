@@ -67,6 +67,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
     private Map<String, ViroArObject> nameVsArObjectMap = new HashMap<>();
 
+    private List<String> activeImageTargets = new ArrayList<>();
+
     // +---------------------------------------------------------------------------+
     //  Initialization
     // +---------------------------------------------------------------------------+
@@ -92,15 +94,18 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         View.inflate(this, R.layout.ar_controls, ((ViewGroup) mViroView));
         findViewById(R.id.reload).setOnClickListener((v) -> {
             Log.i(TAG, "Clicked reload!!!");
-            mTargetedNodesMap.entrySet().forEach(e -> {
-                e.getValue().second.forEach(node -> {
-                    Log.i(TAG, "Making invisible!!!");
-                    node.setVisible(false);
-                });
-            });
+            removeActiveObjects();
         });
     }
 
+    public void removeActiveObjects(){
+        mTargetedNodesMap.values().stream()
+                .filter(pair -> activeImageTargets.contains(pair.first.getId()))
+                .forEach(pair -> {
+                    activeImageTargets.remove(pair.first.getId());
+                    pair.second.forEach(node -> node.setVisible(false));
+                });
+    }
 
     private void onRenderCreate() {
         // Create the base ARScene
@@ -159,6 +164,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             Log.i(TAG, "Expected key " + anchorId + " not found");
             return;
         }
+        activeImageTargets.add(anchorId);
         setNodeNames(anchorId, mTargetedNodesMap.get(anchorId).second);
         makeVisible(anchor, mTargetedNodesMap.get(anchorId).second);
     }
@@ -232,6 +238,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         Object3D objectNode = new Object3D();
 
         Vector scale = new Vector(viroArObject.scaleX, viroArObject.scaleY, viroArObject.scaleZ);
+        objectNode.setScale(scale);
         objectNode.loadModel(mViroView.getViroContext(), Uri.parse(viroArObject.objectWebLink), viroArObject.type, new AsyncObject3DListener() {
             @Override
             public void onObject3DLoaded(final Object3D object, final Object3D.Type type) {
