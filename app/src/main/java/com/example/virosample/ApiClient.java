@@ -44,9 +44,7 @@ public class ApiClient {
     public ScenesListResult listScenes(){
         String resp = get("/scenes/");
         ScenesListResult listResult = gson.fromJson(resp, ScenesListResult.class);
-        for(SceneResult result : listResult.results){
-            System.out.println(result.name);
-        }
+
         return listResult;
     }
 
@@ -179,9 +177,17 @@ public class ApiClient {
         }
     }
 
+    public class SceneList {
+        String name;
+    }
+
     public static class LinkResult{
         ImageTarget image_target;
         ArObject ar_object;
+    }
+
+    public static class LinkSceneResults{
+        SceneList sceneName;
     }
 
     public static class ListArObjectsResult{
@@ -197,7 +203,7 @@ public class ApiClient {
     }
 
     public static class ScenesListResult{
-        List<SceneResult> results;
+        List<SceneList> results;
     }
 
 }
