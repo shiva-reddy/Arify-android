@@ -246,7 +246,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
     private void loadTextures(Node node, String mtlWebLink) {
         try {
-            Bitmap btm = ArTestActivity.getImageAssetUri(mtlWebLink);
+            Bitmap btm = ApiClient.getImageAssetUri(mtlWebLink);
             Texture texture = new Texture(btm, Texture.Format.RGBA8, true, true);
             Material material = new Material();
             material.setDiffuseTexture(texture);
