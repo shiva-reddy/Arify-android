@@ -90,6 +90,15 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         });
         setContentView(mViroView);
         View.inflate(this, R.layout.ar_controls, ((ViewGroup) mViroView));
+//        View.inflate(this, R.layout.ar_controls, ((ViewGroup) mViroView));
+//
+//        findViewById(R.id.reload).setOnClickListener((v) -> {
+//            mTargetedNodesMap.entrySet().forEach(e -> {
+//                e.getValue().second.forEach(node -> {
+//                    node.setVisible(false);
+//                });
+//            });
+//        });
     }
 
 
@@ -141,6 +150,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     @Override
     public void onAnchorFound(ARAnchor anchor, ARNode arNode) {
         String anchorId = anchor.getAnchorId();
+        Toast.makeText(this, "Anchor found for " + toName(anchorId), Toast.LENGTH_LONG).show();
         if(toName(anchorId) == null){
             return;
         }
@@ -149,7 +159,6 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             return;
         }
         setNodeNames(anchorId, mTargetedNodesMap.get(anchorId).second);
-        Toast.makeText(this, "Anchor found for " + toName(anchorId), Toast.LENGTH_LONG).show();
         makeVisible(anchor, mTargetedNodesMap.get(anchorId).second);
     }
 

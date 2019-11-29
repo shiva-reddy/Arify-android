@@ -114,7 +114,7 @@ public class ApiClient {
     }
 
     public Map<ViroImageTarget, List<ViroArObject>> getImageTargetVsArObjectList(String sceneName){
-        return listLinksForScene("sceneName")
+        return listLinksForScene(sceneName)
                 .results
                 .stream()
                 .collect(Collectors.groupingBy(ApiClient.LinkResult::imageTargetName))
