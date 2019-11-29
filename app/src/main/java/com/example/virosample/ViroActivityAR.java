@@ -63,6 +63,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
     private Map<String, String> keyVsName = new HashMap<>();
 
+    private Map<String, List<String>> imageTargetKeyVsNodeNamesList = new HashMap<>();
+
     private Map<String, ViroArObject> nameVsArObjectMap = new HashMap<>();
 
     // +---------------------------------------------------------------------------+
@@ -88,6 +90,15 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         });
         setContentView(mViroView);
         View.inflate(this, R.layout.ar_controls, ((ViewGroup) mViroView));
+        findViewById(R.id.reload).setOnClickListener((v) -> {
+            Log.i(TAG, "Clicked reload!!!");
+            mTargetedNodesMap.entrySet().forEach(e -> {
+                e.getValue().second.forEach(node -> {
+                    Log.i(TAG, "Making invisible!!!");
+                    node.setVisible(false);
+                });
+            });
+        });
     }
 
 
@@ -109,6 +120,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         keyVsName.put(key, viroImageTarget.name);
 
         List<Node> nodes = new ArrayList<>();
+        List<String> nodeNames = new ArrayList<>();
 
         for(ViroArObject viroArObject : linkedViroArObjects){
             Node arObjectNode = new Node();
@@ -117,7 +129,10 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             arObjectNode.setVisible(false);
             mScene.getRootNode().addChildNode(arObjectNode);
             nodes.add(arObjectNode);
+            nodeNames.add(viroArObject.objectName);
+            Log.i(TAG, "Loaded model " + viroArObject.objectName);
         }
+        imageTargetKeyVsNodeNamesList.put(key, nodeNames);
         mTargetedNodesMap.put(key, new Pair<>(arImageTarget, nodes));
     }
 
@@ -139,12 +154,20 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         if(toName(anchorId) == null){
             return;
         }
+        Toast.makeText(this, "Anchor found for " + toName(anchorId), Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             Log.i(TAG, "Expected key " + anchorId + " not found");
             return;
         }
-        Toast.makeText(this, "Anchor found for " + toName(anchorId), Toast.LENGTH_LONG).show();
+        setNodeNames(anchorId, mTargetedNodesMap.get(anchorId).second);
         makeVisible(anchor, mTargetedNodesMap.get(anchorId).second);
+    }
+
+    private void setNodeNames(String anchorId, List<Node> nodesToActivate) {
+        List<String> names = imageTargetKeyVsNodeNamesList.get(anchorId);
+        for(int i = 0; i < names.size(); i++){
+            nodesToActivate.get(i).setName(names.get(i));
+        }
     }
 
     public void makeVisible(ARAnchor anchor, List<Node> arNodes){

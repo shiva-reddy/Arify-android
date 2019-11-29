@@ -49,7 +49,6 @@ public class ApiClient {
     public ScenesListResult listScenes(){
         String resp = get("/scenes/");
         ScenesListResult listResult = gson.fromJson(resp, ScenesListResult.class);
-
         return listResult;
     }
 
@@ -142,7 +141,6 @@ public class ApiClient {
     }
 
     public Map<ViroImageTarget, List<ViroArObject>> getImageTargetVsArObjectList(String sceneName){
-
         Map<ImageTarget, List<LinkResult>> collectorsResult = listLinksForScene(sceneName)
                 .results
                 .stream()
@@ -174,8 +172,14 @@ public class ApiClient {
         viroArObject.scaleX = getOrDefault(ar_object.scale_x, 0.1f);
         viroArObject.scaleY = getOrDefault(ar_object.scale_y, 0.1f);
         viroArObject.scaleZ = getOrDefault(ar_object.scale_z, 0.1f);
+        viroArObject.XOffset = getOrDefault(ar_object.pos_offset_x, 0.0f);
+        viroArObject.YOffset = getOrDefault(ar_object.pos_offset_y, 0.0f);
+        viroArObject.ZOffset = getOrDefault(ar_object.pos_offset_z, 0.0f);
         viroArObject.rotX = getOrDefault(ar_object.rot_x, 0.0f);
         viroArObject.rotZ = getOrDefault(ar_object.rot_z,0.0f);
+        viroArObject.XOffset = getOrDefault(ar_object.pos_offset_x, 0.0f);
+        viroArObject.YOffset = getOrDefault(ar_object.pos_offset_y, 0.0f);
+        viroArObject.ZOffset = getOrDefault(ar_object.pos_offset_z, 0.0f);
         return viroArObject;
     }
 
@@ -260,7 +264,7 @@ public class ApiClient {
     public static class ArObject{
         String name;
         String link;
-        Float scale_x, scale_y, scale_z, rot_x, rot_z;
+        Float scale_x, scale_y, scale_z, rot_x, rot_z, pos_offset_x, pos_offset_y, pos_offset_z;
         String model_type;
         String mtl_link;
 
