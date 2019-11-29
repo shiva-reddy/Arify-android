@@ -184,7 +184,7 @@ public class ApiClient {
 
     public static void main(String[] args) throws IOException, JSONException {
         ApiClient apiClient = new ApiClient();
-        apiClient.listLinksForScene("scene_1");
+        apiClient.getImageTargetVsArObjectList("scene_1");
     }
 
     public String get(String endPoint) {
@@ -211,8 +211,8 @@ public class ApiClient {
         String link;
 
         @Override
-        public boolean equals(Object obj){
-            return (obj instanceof ImageTarget && ((ImageTarget) obj).name.equals(this.name));
+        public int hashCode(){
+            return name.hashCode();
         }
     }
 
