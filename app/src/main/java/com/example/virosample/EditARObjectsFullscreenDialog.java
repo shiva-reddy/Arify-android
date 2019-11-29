@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-public class AddARObjectsFullscreenDialog extends DialogFragment implements View.OnClickListener {
+public class EditARObjectsFullscreenDialog extends DialogFragment implements View.OnClickListener {
 
     private Callback callback;
     private EditText objectName_ET;
@@ -22,7 +22,7 @@ public class AddARObjectsFullscreenDialog extends DialogFragment implements View
         this.callback = callback;
     }
 
-    public AddARObjectsFullscreenDialog(String imageTargetName){
+    public EditARObjectsFullscreenDialog(String imageTargetName){
         this.imageTargetName = imageTargetName;
     }
 
@@ -54,7 +54,7 @@ public class AddARObjectsFullscreenDialog extends DialogFragment implements View
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.add_objects_dialog, container, false);
+        View view = inflater.inflate(R.layout.edit_objects_dialog, container, false);
         ImageButton close = view.findViewById(R.id.edit_objects_fullscreen_dialog_close);
         TextView action = view.findViewById(R.id.edit_objects_fullscreen_dialog_action);
 
