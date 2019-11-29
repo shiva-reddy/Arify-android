@@ -90,15 +90,15 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
         });
         setContentView(mViroView);
         View.inflate(this, R.layout.ar_controls, ((ViewGroup) mViroView));
-//        View.inflate(this, R.layout.ar_controls, ((ViewGroup) mViroView));
-//
-//        findViewById(R.id.reload).setOnClickListener((v) -> {
-//            mTargetedNodesMap.entrySet().forEach(e -> {
-//                e.getValue().second.forEach(node -> {
-//                    node.setVisible(false);
-//                });
-//            });
-//        });
+        findViewById(R.id.reload).setOnClickListener((v) -> {
+            Log.i(TAG, "Clicked reload!!!");
+            mTargetedNodesMap.entrySet().forEach(e -> {
+                e.getValue().second.forEach(node -> {
+                    Log.i(TAG, "Making invisible!!!");
+                    node.setVisible(false);
+                });
+            });
+        });
     }
 
 
@@ -130,6 +130,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             mScene.getRootNode().addChildNode(arObjectNode);
             nodes.add(arObjectNode);
             nodeNames.add(viroArObject.objectName);
+            Log.i(TAG, "Loaded model " + viroArObject.objectName);
         }
         imageTargetKeyVsNodeNamesList.put(key, nodeNames);
         mTargetedNodesMap.put(key, new Pair<>(arImageTarget, nodes));
@@ -150,10 +151,10 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     @Override
     public void onAnchorFound(ARAnchor anchor, ARNode arNode) {
         String anchorId = anchor.getAnchorId();
-        Toast.makeText(this, "Anchor found for " + toName(anchorId), Toast.LENGTH_LONG).show();
         if(toName(anchorId) == null){
             return;
         }
+        Toast.makeText(this, "Anchor found for " + toName(anchorId), Toast.LENGTH_LONG).show();
         if (!mTargetedNodesMap.containsKey(anchorId)) {
             Log.i(TAG, "Expected key " + anchorId + " not found");
             return;
