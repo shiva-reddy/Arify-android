@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.os.Environment;
@@ -84,11 +85,32 @@ public class AddTarget extends Activity {
             findViewById(R.id.place_model).setOnClickListener((v) -> {
                 Log.d("getText",editText.getText().toString());
                 String image_name = editText.getText().toString();
-                apiClient.uploadImageTargetToScene(current_scene, image_name, final_image);
-                apiClient.linkImageTargetToARObjectInScene(current_scene,model_spinner.getSelectedItem().toString(),image_name);
+                UploadImageTargetRequest req = new UploadImageTargetRequest();
+                req.current_scene = current_scene;
+                req.image_name = image_name;
+                req.final_image = final_image;
+                new UploadImageTask().execute(req);
                 finish();
             });
     }
+
+    class UploadImageTargetRequest{
+        String current_scene, image_name;
+        File final_image;
+    }
+
+
+    class UploadImageTask extends AsyncTask<UploadImageTargetRequest, UploadImageTargetRequest, String> {
+
+        @Override
+        protected String doInBackground(UploadImageTargetRequest... uploadImageTargetRequests) {
+            UploadImageTargetRequest req = uploadImageTargetRequests[0];
+            ApiClient.build().uploadImageTargetToScene(req.current_scene, req.image_name, final_image);
+            ApiClient.build().linkImageTargetToARObjectInScene(req.current_scene,model_spinner.getSelectedItem().toString(),req.image_name);
+            return null;
+        }
+    }
+
     public File saveImageToInternalStorage(Bitmap image) {
         String filename = new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime()) + ".png";
         try {

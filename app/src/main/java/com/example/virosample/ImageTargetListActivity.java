@@ -67,6 +67,15 @@ public class ImageTargetListActivity extends AppCompatActivity {
         }
     }
 
+    class ArObjectUpdateTask extends AsyncTask<ViroArObject, ViroArObject, String> {
+        @Override
+        protected String doInBackground(ViroArObject... newArObjects) {
+            ViroArObject newArObject = newArObjects[0];
+            ApiClient.build().updateArObject(SCENE_NAME,newArObject.objectName,newArObject.scaleX,newArObject.scaleY,newArObject.scaleZ,newArObject.XOffset,newArObject.YOffset,newArObject.ZOffset,newArObject.rotX,newArObject.rotZ);
+            return null;
+        }
+    }
+
     public void loadView(Map<ViroImageTarget, List<ViroArObject>> imageTargetVsObjLocationMap){
         setContentView(R.layout.activity_image_target_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -183,9 +192,12 @@ public class ImageTargetListActivity extends AppCompatActivity {
     public void editARObjects(ViroArObject arObjectName){
         DialogFragment dialog = new EditARObjectsFullscreenDialog(arObjectName);
         ((EditARObjectsFullscreenDialog) dialog).setCallback(new EditARObjectsFullscreenDialog.Callback() {
+
             @Override
             public void onActionClick(ViroArObject newArObject) {
-                ApiClient.build().updateArObject(SCENE_NAME,arObjectName.objectName,newArObject.scaleX,newArObject.scaleY,newArObject.scaleZ,newArObject.XOffset,newArObject.YOffset,newArObject.ZOffset,newArObject.rotX,newArObject.rotZ);
+                newArObject.objectName = arObjectName.objectName;
+                new ArObjectUpdateTask().execute(newArObject);
+
             }
         });
         dialog.show(getSupportFragmentManager(), "tag");
