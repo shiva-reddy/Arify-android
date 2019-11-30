@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -76,9 +77,8 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTargetedNodesMap = new HashMap<String, Pair<ARImageTarget, List<Node>>>();
-        imageTargetVsObjects = ArTestActivity.imageTargetVsArObjectListMap;
-
+        setContentView(R.layout.loading_page);
+        String sceneName = getIntent().getStringExtra("SceneName");
         mViroView = new ViroViewARCore(this, new ViroViewARCore.StartupListener() {
             @Override
             public void onSuccess() {
@@ -90,6 +90,27 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                 Log.e(TAG, "Error initializing AR [" + errorMessage + "]");
             }
         });
+        new ImageTargetVsObjsListMapLoader().execute(sceneName);
+    }
+
+    class ImageTargetVsObjsListMapLoader extends AsyncTask<String, String, Map<ViroImageTarget, List<ViroArObject>>> {
+
+        @Override
+        protected Map<ViroImageTarget, List<ViroArObject>> doInBackground(String... strings) {
+            return ApiClient.build().getImageTargetVsArObjectList(strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Map<ViroImageTarget, List<ViroArObject>> result) {
+            Log.i("my_viro_log", "Post execute");
+            loadView(result);
+            super.onPostExecute(result);
+        }
+    }
+
+    public void loadView(Map<ViroImageTarget, List<ViroArObject>> _imageTargetVsObjects){
+        mTargetedNodesMap = new HashMap<String, Pair<ARImageTarget, List<Node>>>();
+        imageTargetVsObjects = _imageTargetVsObjects;
         setContentView(mViroView);
         View.inflate(this, R.layout.ar_controls, ((ViewGroup) mViroView));
         findViewById(R.id.reload).setOnClickListener((v) -> {
@@ -105,6 +126,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             zoomOutObjects();
         });
     }
+
     public void zoomInObjects(){
         mTargetedNodesMap.values().stream()
                 .filter(pair -> activeImageTargets.contains(pair.first.getId()))

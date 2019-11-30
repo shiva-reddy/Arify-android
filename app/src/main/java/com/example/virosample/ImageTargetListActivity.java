@@ -46,11 +46,10 @@ public class ImageTargetListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        String sceneName = getIntent().getStringExtra("SCENE_NAME");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loading_page);
+        String sceneName = getIntent().getStringExtra("SCENE_NAME");
         new ImageTargetVsObjsListMapLoader().execute(sceneName);
-
     }
 
     class ImageTargetVsObjsListMapLoader extends AsyncTask<String, String, Map<ViroImageTarget, List<ViroArObject>>> {

@@ -56,10 +56,9 @@ public class SceneListActivity extends AppCompatActivity {
         registerForContextMenu(sceneListView);
         sceneListView.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
             SceneList sceneListEle = (SceneList) parent.getItemAtPosition(position );
-
             Intent arSceneIntent = new Intent(this,ViroActivityAR.class);
-            //arSceneIntent.putExtra("SceneName", sceneListEle.getmSceneName());
-            //startActivity(arSceneIntent);
+            arSceneIntent.putExtra("SceneName", sceneListEle.getmSceneName());
+            startActivity(arSceneIntent);
         });
 
         FloatingActionButton fab = findViewById(R.id.fab);
