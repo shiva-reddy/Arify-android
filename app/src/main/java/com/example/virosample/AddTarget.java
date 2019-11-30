@@ -69,7 +69,17 @@ public class AddTarget extends Activity {
             this.setImageView(photo);
             File file = saveImageToInternalStorage(photo);
             final_image=file;
-            findViewById(R.id.crop).setOnClickListener((v) -> performCrop(file));
+            findViewById(R.id.crop).setOnClickListener((v) -> {
+                if ( (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) &&
+                        (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+                    performCrop(file);
+                }
+                else {
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                }
+
+            });
 
             findViewById(R.id.place_model).setOnClickListener((v) -> {
                 Log.d("getText",editText.getText().toString());
@@ -129,15 +139,6 @@ public class AddTarget extends Activity {
     }
 
     private void performCrop(File file){
-        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        }
-        if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }
-
         try {
             //call the standard crop action intent (the user device may not support it)
             //indicate image type and Uri
