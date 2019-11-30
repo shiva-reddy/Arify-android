@@ -15,6 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.StrictMode;
 import android.util.Log;
@@ -41,6 +42,7 @@ public class ImageTargetListActivity extends AppCompatActivity {
     List<ViroImageTarget> mImageTargetList;
 
     private Context mContext = this;
+    SwipeRefreshLayout pullToRefresh;
 
     private static final int CAMERA_REQUEST = 1888;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
@@ -86,11 +88,11 @@ public class ImageTargetListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image_target_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
+        getSupportActionBar().setTitle("Image Targets");
         expandableListView = findViewById(R.id.image_target_list_view);
         SCENE_NAME = getIntent().getStringExtra("SCENE_NAME");
         imageTargetVsObjMap = imageTargetVsObjLocationMap;
-
+        pullToRefresh = (SwipeRefreshLayout) findViewById(R.id.pullToRefresh);
         List<ViroImageTarget> imageTargetList = new ArrayList<ViroImageTarget>(imageTargetVsObjLocationMap.keySet());
         mImageTargetList = imageTargetList;
         // initializing the views
@@ -102,6 +104,12 @@ public class ImageTargetListActivity extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.imageTarget_fab);
         fab.setOnClickListener(view -> {
             this.openCameraActivity();
+        });
+
+        pullToRefresh.setOnRefreshListener(() -> {
+            setContentView(R.layout.loading_page);
+            new ImageTargetVsObjsListMapLoader().execute(SCENE_NAME);
+            expandableListViewAdapter.notifyDataSetChanged();
         });
         registerForContextMenu(expandableListView);
     }
