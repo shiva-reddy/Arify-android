@@ -47,16 +47,16 @@ To view the scene in AR, click the scene from the main list menu.
 
 ![View in AR](https://lh3.googleusercontent.com/DKszOvpGC3-5D08u7GmCmwFLsYXG1pSjaodGKy2UQ2iaMpTXnCXCJ-4qJ_fYAgpeq_aWTfSWsNtR2sju71XEnwTNSZq-JbzaNX__vN_sEPrT4B8hBq2LoHPIvUC-q4NTuGjhylfW1ovQlbnK5sSTeJ_T23wVM-kieqZ6STr2hsYquyuNbeU6DaAfE3eAs1EbouWn5nioqcskj8rQSR00cUrO_aslCmYzaKeyzbryZsSMHIEx13pXNU5ZaIGgSJhoM4ilh8oRBGmYX88p1UuPtM_WBHJXXojyoh4AZm_6YmBK02RPboZo-iyjIRp7nUNNL2pioWtpbJED1m-Mv-bBmr8hzp0Dd9C49CJSfhZHJOOjuWR4772iPoNVmpbXvYgRXaOgns2BK17Tt12NYBu77TFaIa60trdnihV5G4zfeXtFlNk0766r9Q_JFaoNFF_ORlpeZ6rMrd3Xchf8pVpyH3zFXi0SxFe9ryL2scJ-kcbCM5RilrRq_ws70sZmY682OrHd-elcqEVh_1gP5pYp85Pns77qFX13XHpMAn6UXeiELwK79i6JRBe1vJGT9Rf5TnMYyY19dEYgDISuRftpymiLqmzUDjLhuwVclsdQqPp8G9-gIy8avFVy0FjyJfv77PNbByZYXUTlV-SZNdaMFDt7lkUHgmL4ISP4PLTTJD6LDEtE3CdQS4-mv5XFRMlOJ0MLPhHqLGHVLpJydFMzdUJLYG2hN_yIwn9TQvKORhEnKN6umA=w487-h973-no)
 
+You can also play with scale and rotation functions using the buttons in the UI.
 
-### Add extra AR Objects to an image target
 
-You can add multiple AR objects to the scene, click and hold the image target to which you want to add the objects, and choose the new object.
+### Editing a scene
+
+You can add multiple AR objects to the scene, click and hold the image target to which you want to add the objects, and choose the new object. Click and hold on the scene to bring up the edit options UI.
 
 ![Edit scene](https://lh3.googleusercontent.com/zyMMqJs1pyLNvdANP3lyVvqSueNinLynbFnUwApQpTmsJTcIdH-CRwOvSZqkZ-Hpn9axOTd4KK2mJMHlAkg5yX3pC3PeK4PZlkh3N1q8a80bhbJ9dQ5GAxNc-Uox5zKSKiuYdWoJZjdCOGhxJUcsUeOTCiHvb7jZEHsOltkKdLy8fyNNlL0Tmue2yIF0zkrEnfQ-m9OtkKtmz1Cw-xnQdGrqn1pHDvRUM45Y9vQ5q0NOyaiciTH5pwYKibu8UWXJa0r-n7WcqTg3ut9SWVg5TnEDWpTbXzf3D1juZYVWeTjpT6HWnl7G7STKn1RHxY6z6n56ON3_9GOkvZ-0uOOVUXoGyvcdQHo4NsDF8lWUVe4Bdhblfupc-_zApMNCP9WUQ01woOemBG3yA-J8UAD-25lB51qsRufy73y2xKn59aOltSbc2-hy-pajL2VlwFvny_zbcuIXZWNvx_z1xpM7VwrNVXF9QmPRYelwwLSX4YcphSFVzM-QEDBQw0r-xajziNTNHu3-oIjuy9SiMLUHinMK1mawSL--koh7_Y2jpjr3SbifDKZC_5KXa-3IA1dcRIl0jNJWS3p2WtJ22e7AT_T3_lJ26qucWfwzEHH7NOmX2gO_limazQT5Db8Qmz0vKIiBcyO7488oBOio--1mdTdMhWel8pNkhe7-6tQ4ihfzEIwQOuWHaHo3oB1D3MFxKeBCmIcu9239cFbM8d6oFbRdfLQPat79Ww-tdxn_2TGioO1shg=w487-h973-no)
 
 
-
-### Updating AR Object parameters
 
 You can update the AR objects' properties to choose where and how the objects are displayed, click and hold on the AR object in the menu to bring up the update AR object UI.
 
