@@ -55,6 +55,7 @@ public class ArTestActivity extends AppCompatActivity {
             super.onPreExecute();
         }
 
+
         @Override
         protected void onPostExecute(Map<ViroImageTarget, List<ViroArObject>> viroImageTargetListMap) {
             Log.i("my_viro_log", "Post execute");
