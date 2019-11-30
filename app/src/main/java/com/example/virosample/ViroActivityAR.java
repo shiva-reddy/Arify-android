@@ -38,6 +38,7 @@ import com.viro.core.ClickState;
 import com.viro.core.Material;
 import com.viro.core.Node;
 import com.viro.core.Object3D;
+import com.viro.core.Quaternion;
 import com.viro.core.Spotlight;
 import com.viro.core.Surface;
 import com.viro.core.Texture;
@@ -125,8 +126,60 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             Log.i(TAG, "Clicked zoomout");
             zoomOutObjects();
         });
+        /*findViewById(R.id.leftButton).setOnClickListener((v) -> {
+            Log.i(TAG, "Clicked rotate left");
+            rotateLeft();
+        });*/
+
+        findViewById(R.id.rotateY).setOnClickListener((v) -> {
+            Log.i(TAG, "Clicked rotate right");
+            rotateY();
+        });
+        findViewById(R.id.rotateZ).setOnClickListener((v) -> {
+            Log.i(TAG, "Clicked rotate right");
+            rotateZ();
+        });
+    }
+    /*public void rotateLeft(){
+        mTargetedNodesMap.values().stream()
+                .filter(pair -> activeImageTargets.contains(pair.first.getId()))
+                .forEach(pair -> {
+                    pair.second.forEach(node -> {
+                        Vector r = node.getRotationEulerRealtime();
+                        r.x = (r.x - 45)%360;
+                        node.setRotation(r);
+                    });
+                });
+    }*/
+
+    public void rotateZ(){
+        mTargetedNodesMap.values().stream()
+                .filter(pair -> activeImageTargets.contains(pair.first.getId()))
+                .forEach(pair -> {
+                    pair.second.forEach(node -> {
+                        Vector r = node.getRotationEulerRealtime();
+                        //Toast.makeText(this, "Rotate " + r.z, Toast.LENGTH_SHORT).show();
+                        r.z = r.z + 0.3f ;
+
+                        node.setRotation(r);
+
+                    });
+                });
     }
 
+    public void rotateY(){
+        mTargetedNodesMap.values().stream()
+                .filter(pair -> activeImageTargets.contains(pair.first.getId()))
+                .forEach(pair -> {
+                    pair.second.forEach(node -> {
+                        Vector r = node.getRotationEulerRealtime();
+                        //Toast.makeText(this, "Rotate y" + r.y, Toast.LENGTH_SHORT).show();
+                        r.y = r.y + 0.3f ;
+                        node.setRotation(r);
+
+                    });
+                });
+    }
     public void zoomInObjects(){
         mTargetedNodesMap.values().stream()
                 .filter(pair -> activeImageTargets.contains(pair.first.getId()))
@@ -134,8 +187,10 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                     pair.second.forEach(node -> {
                         Vector v= node.getScaleRealtime();
                         node.setScale(v.scale((float) 2.0));
+                        //Toast.makeText(this, "Scaled to " + node.getScaleRealtime().x+ "X", Toast.LENGTH_SHORT).show();
                     });
                 });
+
     }
     public void zoomOutObjects(){
         mTargetedNodesMap.values().stream()

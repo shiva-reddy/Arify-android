@@ -39,4 +39,27 @@
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/ic_zoom_out_black_24dp" />
 
+    <ImageButton
+        android:id="@+id/rotateY"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="37dp"
+        android:layout_marginBottom="54dp"
+        android:background="@drawable/ic_360_rotate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageButton
+        android:id="@+id/rotateZ"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="37dp"
+        android:layout_marginBottom="37dp"
+        app:layout_constraintBottom_toTopOf="@+id/rotateY"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/ic_rotate_left_black_24dp" />
+
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
