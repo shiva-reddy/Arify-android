@@ -39,7 +39,7 @@ public class ArTestActivity extends AppCompatActivity {
 
         imageTargetVsArObjectListMap = ApiClient
                 .build()
-                .getImageTargetVsArObjectList("scene_1");
+                .getImageTargetVsArObjectList("scene_2");
 
         Intent startAR = new Intent(this, ViroActivityAR.class);
         startActivity(startAR);
