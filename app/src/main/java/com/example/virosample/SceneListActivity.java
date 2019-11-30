@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class SceneListActivity extends AppCompatActivity {
     List<String> sceneList =new ArrayList<>();
     SceneListAdapter sceneListAdapter;
     SceneListActivity mContext =this;
+    SwipeRefreshLayout pullToRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,9 @@ public class SceneListActivity extends AppCompatActivity {
         sceneList.forEach(sceneName ->{
             sceneListArrayList.add(new SceneList(sceneName));
         });
+
+        pullToRefresh = findViewById(R.id.scene_pullToRefresh);
+
         sceneListAdapter = new SceneListAdapter(this, sceneListArrayList);
         sceneListView.setAdapter(sceneListAdapter);
         registerForContextMenu(sceneListView);
@@ -61,13 +66,20 @@ public class SceneListActivity extends AppCompatActivity {
             startActivity(arSceneIntent);
         });
 
+        pullToRefresh.setOnRefreshListener(()->{
+            setContentView(R.layout.loading_page);
+            new ScenesListLoader().execute();
+            sceneListAdapter.notifyDataSetChanged();
+        });
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             DialogFragment dialog = AddSceneFullscreenDialog.newInstance();
             ((AddSceneFullscreenDialog) dialog).setCallback(new AddSceneFullscreenDialog.Callback() {
                 @Override
                 public void onActionClick(String name) {
-                    Toast.makeText(mContext,name, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext,name, Toast.LENGTH_SHORT).show();
+                    new SaveScene().execute(name);
                 }
             });
             dialog.show(getSupportFragmentManager(), "tag");
@@ -120,6 +132,16 @@ public class SceneListActivity extends AppCompatActivity {
             loadScenesView(listResult);
             super.onPostExecute(listResult);
         }
+    }
+
+   class SaveScene extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            ApiClient.build().createScene(strings[0]);
+            return null;
+        }
+
     }
 
 
