@@ -99,7 +99,6 @@ public class AddTarget extends Activity {
         File final_image;
     }
 
-
     class UploadImageTask extends AsyncTask<UploadImageTargetRequest, UploadImageTargetRequest, String> {
 
         @Override
