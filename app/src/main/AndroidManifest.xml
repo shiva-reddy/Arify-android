@@ -26,15 +26,14 @@
         <activity android:name=".AddTarget"></activity>
         <activity android:name=".CameraTestActivity"></activity>
         <activity android:name=".ArTestActivity" />
-        <activity android:name=".SceneListActivity" />
-        <activity android:name=".MainActivity" >
-
+        <activity android:name=".SceneListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" />
 
         <meta-data
             android:name="com.viromedia.API_KEY"
