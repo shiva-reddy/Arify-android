@@ -12,8 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import javax.security.auth.callback.Callback;
-
 public class AddSceneFullscreenDialog extends DialogFragment implements View.OnClickListener {
 
     private Callback callback;
@@ -57,7 +55,7 @@ public class AddSceneFullscreenDialog extends DialogFragment implements View.OnC
         View view = inflater.inflate(R.layout.add_scene_dialog, container, false);
         ImageButton close = view.findViewById(R.id.fullscreen_dialog_close);
         TextView action = view.findViewById(R.id.fullscreen_dialog_action);
-        sceneName_ET = view.findViewById(R.id.sceneName_editText);
+        sceneName_ET = view.findViewById(R.id.imageTarget_ET);
 
         close.setOnClickListener(this);
         action.setOnClickListener(this);

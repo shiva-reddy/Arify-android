@@ -1,6 +1,13 @@
 package com.example.virosample;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -11,6 +18,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,22 +46,42 @@ public class ImageTargetListActivity extends AppCompatActivity {
     private String SCENE_NAME;
 
     private Context mContext = this;
+
+    private static final int CAMERA_REQUEST = 1888;
+    private static final int MY_CAMERA_PERMISSION_CODE = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        String sceneName = getIntent().getStringExtra("SCENE_NAME");
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.loading_page);
+        new ImageTargetVsObjsListMapLoader().execute(sceneName);
 
+    }
+
+    class ImageTargetVsObjsListMapLoader extends AsyncTask<String, String, Map<ViroImageTarget, List<ViroArObject>>> {
+
+        @Override
+        protected Map<ViroImageTarget, List<ViroArObject>> doInBackground(String... strings) {
+            return ApiClient.build().getImageTargetVsArObjectList(strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Map<ViroImageTarget, List<ViroArObject>> result) {
+            Log.i("my_viro_log", "Post execute");
+            loadView(result);
+            super.onPostExecute(result);
+        }
+    }
+
+    public void loadView(Map<ViroImageTarget, List<ViroArObject>> imageTargetVsObjLocationMap){
         setContentView(R.layout.activity_image_target_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_name);
-
         expandableListView = findViewById(R.id.image_target_list_view);
-
         SCENE_NAME = getIntent().getStringExtra("SCENE_NAME");
-
-        imageTargetVsObjLocationMap = ApiClient.build().getImageTargetVsArObjectList(SCENE_NAME);
         imageTargetList = new ArrayList<ViroImageTarget>(imageTargetVsObjLocationMap.keySet());
-
         // initializing the views
         initViews();
 
@@ -62,12 +90,11 @@ public class ImageTargetListActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.imageTarget_fab);
         fab.setOnClickListener(view -> {
-
+            this.openCameraActivity();
         });
-
         registerForContextMenu(expandableListView);
-
     }
+
     /**
      * method to initialize the views
      */
@@ -162,10 +189,61 @@ public class ImageTargetListActivity extends AppCompatActivity {
         ((EditARObjectsFullscreenDialog) dialog).setCallback(new EditARObjectsFullscreenDialog.Callback() {
             @Override
             public void onActionClick(ViroArObject newArObject) {
-
+                ApiClient.build().updateArObject(SCENE_NAME,arObjectName.objectName,newArObject.scaleX,newArObject.scaleY,newArObject.scaleZ,newArObject.XOffset,newArObject.YOffset,newArObject.ZOffset,newArObject.rotX,newArObject.rotZ);
             }
         });
         dialog.show(getSupportFragmentManager(), "tag");
+    }
+
+    public void openCameraActivity(){
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+        }
+        else
+        {
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_PERMISSION_CODE)
+        {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            }
+            else
+            {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
+        {
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+
+            Intent myIntent = new Intent(this, AddTarget.class);
+            myIntent.putExtra("image", RotateBitmap(photo, (float) 90));
+            myIntent.putExtra("scene",SCENE_NAME);
+            startActivity(myIntent);
+        }
+    }
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
 

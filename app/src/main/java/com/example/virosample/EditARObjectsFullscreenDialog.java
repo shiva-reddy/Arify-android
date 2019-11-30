@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import java.math.BigDecimal;
+
 public class EditARObjectsFullscreenDialog extends DialogFragment implements View.OnClickListener {
 
     private Callback callback;
@@ -97,16 +99,22 @@ public class EditARObjectsFullscreenDialog extends DialogFragment implements Vie
     }
 
     public ViroArObject updateArObject(){
-        selectArObject.scaleX = new Float(scaleX.getText().toString());
-        selectArObject.scaleY = new Float(scaleY.getText().toString());
-        selectArObject.scaleZ = new Float(scaleZ.getText().toString());
-        selectArObject.rotX = new Float(rotX.getText().toString());
-        selectArObject.rotZ = new Float(rotY.getText().toString());
-        selectArObject.XOffset = new Float(offsetX.getText().toString());
-        selectArObject.YOffset = new Float(offsetY.getText().toString());
-        selectArObject.ZOffset = new Float(offsetZ.getText().toString());
+        selectArObject.scaleX = round(new Float(scaleX.getText().toString()),2);
+        selectArObject.scaleY = round(new Float(scaleY.getText().toString()),2);
+        selectArObject.scaleZ = round(new Float(scaleZ.getText().toString()),2);
+        selectArObject.rotX = round(new Float(rotX.getText().toString()),2);
+        selectArObject.rotZ = round(new Float(rotY.getText().toString()),2);
+        selectArObject.XOffset = round(new Float(offsetX.getText().toString()),2);
+        selectArObject.YOffset = round(new Float(offsetY.getText().toString()),2);
+        selectArObject.ZOffset = round(new Float(offsetZ.getText().toString()),2);
 
         return  selectArObject;
+    }
+
+    public static float round(float number, int decimalPlace) {
+        BigDecimal bd = new BigDecimal(number);
+        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+        return bd.floatValue();
     }
 
     public interface Callback {
