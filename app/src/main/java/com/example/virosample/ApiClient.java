@@ -108,6 +108,39 @@ public class ApiClient {
         }
     }
 
+
+    public void updateArObject(String scene, String arObjectName,
+                               Float scaleX, Float scaleY, Float scaleZ,
+                               Float posX, Float posY, Float posZ,
+                               Float rotX, Float rotZ){
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("ar_object_name", arObjectName)
+                .addFormDataPart("scale_x", scaleX.toString())
+                .addFormDataPart("scale_y", scaleY.toString())
+                .addFormDataPart("scale_z", scaleZ.toString())
+                .addFormDataPart("pos_offset_x", posX.toString())
+                .addFormDataPart("pos_offset_y", posY.toString())
+                .addFormDataPart("pos_offset_z", posZ.toString())
+                .addFormDataPart("rot_x", rotX.toString())
+                .addFormDataPart("rot_z", rotZ.toString())
+                .build();
+
+
+        Request request = new Request.Builder()
+                .url( BASE_URL + "/scenes/" + scene + "/update_ar_object")
+                .post(requestBody)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     /**
      * To link an image target to an ar object in a scene
      * @param scene
