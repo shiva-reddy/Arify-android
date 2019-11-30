@@ -11,28 +11,22 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ImageTargetListActivity extends AppCompatActivity {
 
@@ -40,10 +34,10 @@ public class ImageTargetListActivity extends AppCompatActivity {
 
     private ExpandableListViewAdapter expandableListViewAdapter;
 
-    public static Map<ViroImageTarget, List<ViroArObject>> imageTargetVsObjLocationMap = new HashMap<>();
-    public static List<ViroImageTarget> imageTargetList;
-
     private String SCENE_NAME;
+
+    Map<ViroImageTarget, List<ViroArObject>> imageTargetVsObjMap = null;
+    List<ViroImageTarget> mImageTargetList;
 
     private Context mContext = this;
 
@@ -81,12 +75,15 @@ public class ImageTargetListActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.app_name);
         expandableListView = findViewById(R.id.image_target_list_view);
         SCENE_NAME = getIntent().getStringExtra("SCENE_NAME");
-        imageTargetList = new ArrayList<ViroImageTarget>(imageTargetVsObjLocationMap.keySet());
+        imageTargetVsObjMap = imageTargetVsObjLocationMap;
+
+        List<ViroImageTarget> imageTargetList = new ArrayList<ViroImageTarget>(imageTargetVsObjLocationMap.keySet());
+        mImageTargetList = imageTargetList;
         // initializing the views
         initViews();
 
         // initializing the objects
-        initObjects();
+        initObjects(imageTargetList, imageTargetVsObjLocationMap);
 
         FloatingActionButton fab = findViewById(R.id.imageTarget_fab);
         fab.setOnClickListener(view -> {
@@ -107,7 +104,7 @@ public class ImageTargetListActivity extends AppCompatActivity {
     /**
      * method to initialize the objects
      */
-    private void initObjects() {
+    private void initObjects(List<ViroImageTarget> imageTargetList, Map<ViroImageTarget, List<ViroArObject>> imageTargetVsObjLocationMap) {
 
         // initializing the adapter object
         expandableListViewAdapter = new ExpandableListViewAdapter(this, imageTargetList, imageTargetVsObjLocationMap);
@@ -163,8 +160,8 @@ public class ImageTargetListActivity extends AppCompatActivity {
             }
         } else if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
 
-            ViroArObject arObjectNames = imageTargetVsObjLocationMap.get(
-                    imageTargetList.get(groupPosition)).get(
+            ViroArObject arObjectNames = imageTargetVsObjMap.get(
+                    mImageTargetList.get(groupPosition)).get(
                     childPosition);
             this.editARObjects(arObjectNames);
         }
