@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -46,7 +47,12 @@ public class ImageTargetListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        
         setContentView(R.layout.loading_page);
         String sceneName = getIntent().getStringExtra("SCENE_NAME");
         new ImageTargetVsObjsListMapLoader().execute(sceneName);
