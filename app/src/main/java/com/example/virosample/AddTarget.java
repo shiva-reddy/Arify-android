@@ -42,8 +42,8 @@ public class AddTarget extends Activity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         this.imageView = (ImageView)this.findViewById(R.id.imageView);
-        this.editText = (EditText) this.findViewById(R.id.editText);
-        this.model_spinner = (Spinner) this.findViewById(R.id.model_spinner);
+        this.editText = (EditText) this.findViewById(R.id.imageTarget_ET);
+        model_spinner = findViewById(R.id.model_spinner);
         Intent intent= getIntent();
         String current_scene = intent.getStringExtra("scene");
         Log.d("onCreate",current_scene);
