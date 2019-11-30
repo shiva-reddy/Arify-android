@@ -31,7 +31,6 @@ public class SceneListActivity extends AppCompatActivity {
     List<String> sceneList =new ArrayList<>();
     SceneListAdapter sceneListAdapter;
     SceneListActivity mContext =this;
-    private Handler uiViewHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
