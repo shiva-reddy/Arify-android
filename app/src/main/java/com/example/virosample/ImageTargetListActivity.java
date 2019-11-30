@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,6 +18,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,20 +52,36 @@ public class ImageTargetListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        String sceneName = getIntent().getStringExtra("SCENE_NAME");
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.loading_page);
+        new ImageTargetVsObjsListMapLoader().execute(sceneName);
 
+    }
+
+    class ImageTargetVsObjsListMapLoader extends AsyncTask<String, String, Map<ViroImageTarget, List<ViroArObject>>> {
+
+        @Override
+        protected Map<ViroImageTarget, List<ViroArObject>> doInBackground(String... strings) {
+            return ApiClient.build().getImageTargetVsArObjectList(strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Map<ViroImageTarget, List<ViroArObject>> result) {
+            Log.i("my_viro_log", "Post execute");
+            loadView(result);
+            super.onPostExecute(result);
+        }
+    }
+
+    public void loadView(Map<ViroImageTarget, List<ViroArObject>> imageTargetVsObjLocationMap){
         setContentView(R.layout.activity_image_target_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_name);
-
         expandableListView = findViewById(R.id.image_target_list_view);
-
         SCENE_NAME = getIntent().getStringExtra("SCENE_NAME");
-
-        imageTargetVsObjLocationMap = ApiClient.build().getImageTargetVsArObjectList(SCENE_NAME);
         imageTargetList = new ArrayList<ViroImageTarget>(imageTargetVsObjLocationMap.keySet());
-
         // initializing the views
         initViews();
 
@@ -74,10 +92,9 @@ public class ImageTargetListActivity extends AppCompatActivity {
         fab.setOnClickListener(view -> {
             this.openCameraActivity();
         });
-
         registerForContextMenu(expandableListView);
-
     }
+
     /**
      * method to initialize the views
      */

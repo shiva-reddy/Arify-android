@@ -3,46 +3,68 @@ package com.example.virosample;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ArTestActivity extends AppCompatActivity {
 
     public static Map<ViroImageTarget, List<ViroArObject>> imageTargetVsArObjectListMap = new HashMap<>();
+
+    private TextView loadingText;
+
+    private Handler uiViewHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ar_test);
         findViewById(R.id.start).setOnClickListener((v) -> start());
+        loadingText = findViewById(R.id.loading_text_id);
     }
 
 
     private void start() {
-//        if(chosenScene == null){
-//            return;
-//        }
+        new DownloadTask().execute();
+    }
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+    class DownloadTask extends AsyncTask<String, String, Map<ViroImageTarget, List<ViroArObject>>>{
 
-        imageTargetVsArObjectListMap = ApiClient
-                .build()
-                .getImageTargetVsArObjectList("scene_1");
+        Map<ViroImageTarget, List<ViroArObject>> result;
 
-        Intent startAR = new Intent(this, ViroActivityAR.class);
-        startActivity(startAR);
+        @Override
+        protected Map<ViroImageTarget, List<ViroArObject>> doInBackground(String... strings) {
+            uiViewHandler.post(()-> loadingText.setVisibility(View.VISIBLE));
+            result = ApiClient
+                    .build()
+                    .getImageTargetVsArObjectList("scene_1");
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.i("my_viro_log", "Pre execute");
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected void onPostExecute(Map<ViroImageTarget, List<ViroArObject>> viroImageTargetListMap) {
+            Log.i("my_viro_log", "Post execute");
+            uiViewHandler.post(()-> loadingText.setVisibility(View.INVISIBLE));
+            imageTargetVsArObjectListMap = result;
+            Intent startAR = new Intent(ArTestActivity.this, ViroActivityAR.class);
+            startActivity(startAR);
+            super.onPostExecute(viroImageTargetListMap);
+        }
     }
 
 }

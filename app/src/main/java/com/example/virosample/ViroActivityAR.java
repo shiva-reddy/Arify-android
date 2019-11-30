@@ -96,8 +96,35 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
             Log.i(TAG, "Clicked reload!!!");
             removeActiveObjects();
         });
+        findViewById(R.id.zoomin).setOnClickListener((v) -> {
+            Log.i(TAG, "Clicked zoomout");
+            zoomInObjects();
+        });
+        findViewById(R.id.zoomout).setOnClickListener((v) -> {
+            Log.i(TAG, "Clicked zoomout");
+            zoomOutObjects();
+        });
     }
-
+    public void zoomInObjects(){
+        mTargetedNodesMap.values().stream()
+                .filter(pair -> activeImageTargets.contains(pair.first.getId()))
+                .forEach(pair -> {
+                    pair.second.forEach(node -> {
+                        Vector v= node.getScaleRealtime();
+                        node.setScale(v.scale((float) 2.0));
+                    });
+                });
+    }
+    public void zoomOutObjects(){
+        mTargetedNodesMap.values().stream()
+                .filter(pair -> activeImageTargets.contains(pair.first.getId()))
+                .forEach(pair -> {
+                    pair.second.forEach(node -> {
+                        Vector v= node.getScaleRealtime();
+                        node.setScale(v.scale((float) 0.5));
+                    });
+                });
+    }
     public void removeActiveObjects(){
         mTargetedNodesMap.values().stream()
                 .filter(pair -> activeImageTargets.contains(pair.first.getId()))
