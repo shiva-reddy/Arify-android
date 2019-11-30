@@ -44,6 +44,7 @@ public class SceneListActivity extends AppCompatActivity {
         sceneListView = findViewById(R.id.scene_list_view);
         sceneList = listResult.results
                 .stream()
+                .filter(link -> !link.name.equals("global"))
                 .map(link -> link.name
                 ).collect(Collectors.toList());
 
