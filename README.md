@@ -3,7 +3,7 @@
 
 Arify is an android app that can be used to build and view AR scenes in minutes. You can use the app in conjunction with the website to create a new scene, take photos of a target, edit them and choose which AR model to augment on detection of the image.
 
-The app has been built using ViroAR core. The idea is to be build a POC of an app that enables users to build a basic AR scene and distribute it in minutes without having to download and learn how to use complex AR scene generation tools. This will allow users to Arify their world, by building unique AR solutions for their challenges. We have documented a few sample applications for inspiration [here]([https://sites.google.com/view/arifyusecases/home](https://sites.google.com/view/arifyusecases/home)).
+The app has been built using ViroAR core. The idea is to be build a POC of an app that enables users to build a basic AR scene and distribute it in minutes without having to download and learn how to use complex AR scene generation tools. This will allow users to Arify their world, by building unique AR solutions for their challenges. We have documented a few sample applications for inspiration [here](https://sites.google.com/view/arifyusecases/home).
 
 The features supported on the app are:-
  - Capturing and cropping an image and add it to a list of targets.
