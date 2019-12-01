@@ -158,7 +158,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                 .forEach(pair -> {
                     pair.second.forEach(node -> {
                         Vector r = node.getRotationEulerRealtime();
-                        //Toast.makeText(this, "Rotate " + r.z, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(this, "Rotate " + r.z, Toast.LENGTH_SHORT).show();
                         r.z = r.z + 0.3f ;
 
                         node.setRotation(r);
@@ -173,10 +173,9 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                 .forEach(pair -> {
                     pair.second.forEach(node -> {
                         Vector r = node.getRotationEulerRealtime();
-                        //Toast.makeText(this, "Rotate y" + r.y, Toast.LENGTH_SHORT).show();
-                        r.y = r.y + 0.3f ;
+                        r.y = r.y + 0.3f;
                         node.setRotation(r);
-
+//                        Toast.makeText(this, "Setting ne" + r.x + " Set as " + node.getRotationEulerRealtime().x, Toast.LENGTH_SHORT).show();
                     });
                 });
     }
@@ -187,7 +186,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                     pair.second.forEach(node -> {
                         Vector v= node.getScaleRealtime();
                         node.setScale(v.scale((float) 2.0));
-                        //Toast.makeText(this, "Scaled to " + node.getScaleRealtime().x+ "X", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(this, "Scaled to " + node.getScaleRealtime().x+ "X", Toast.LENGTH_SHORT).show();
                     });
                 });
 
@@ -199,6 +198,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
                     pair.second.forEach(node -> {
                         Vector v= node.getScaleRealtime();
                         node.setScale(v.scale((float) 0.5));
+//                        Toast.makeText(this, "Scaled to " + node.getScaleRealtime().x+ "X", Toast.LENGTH_SHORT).show();
                     });
                 });
     }
@@ -365,8 +365,7 @@ public class ViroActivityAR extends Activity implements ARScene.Listener {
 
             @Override
             public void onClick(int i, Node node, Vector vector) {
-                Log.i(TAG, "Making invisible");
-                node.setVisible(false);
+//                Toast.makeText(ViroActivityAR.this, "scale :- " + node.getScalePivot().toString() + " | Rotation:- " + node.getRotationPivot().toString(), Toast.LENGTH_LONG).show();
             }
 
             @Override

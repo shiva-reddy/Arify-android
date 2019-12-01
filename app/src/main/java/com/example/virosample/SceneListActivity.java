@@ -79,7 +79,7 @@ public class SceneListActivity extends AppCompatActivity {
             ((AddSceneFullscreenDialog) dialog).setCallback(new AddSceneFullscreenDialog.Callback() {
                 @Override
                 public void onActionClick(String name) {
-                    //Toast.makeText(mContext,name, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mContext,"Cr", Toast.LENGTH_SHORT).show();
                     new SaveScene().execute(name);
                 }
             });
