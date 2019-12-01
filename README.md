@@ -12,9 +12,9 @@ The features supported on the app are:-
  - Viewing the built scene in AR by choosing the scene.
 
 ## Setup
-The repository is an android project. If you wish to install the app without any changes, you can use the apk [here](https://choosealicense.com/licenses/mit/). You can open the respository in Android studio if you want to tweak the app.
+The repository is an android project. If you wish to install the app without any changes, you can use the apk [here](./app-debug.apk). You can open the respository in Android studio if you want to tweak the app.
 
-The web server with which the app communicates is hosted at "**insert link here**". If you are using a different hosted server, you will have to update the file "config.properties", and set the url for your server for the key **web_base_url**
+If you are using a different hosted server, you will have to update the url variable [here](https://github.com/shiva-reddy-uic/arify-android-client/blob/master/app/src/main/java/com/example/virosample/ApiClient.java#L39).
 
 
 ## Usage
