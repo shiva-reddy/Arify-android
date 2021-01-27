@@ -50,6 +50,7 @@ public class ApiClient {
      */
     public ScenesListResult listScenes(){
         String resp = get("/scenes/");
+        resp = null;
         ScenesListResult listResult = gson.fromJson(resp, ScenesListResult.class);
         return listResult;
     }
